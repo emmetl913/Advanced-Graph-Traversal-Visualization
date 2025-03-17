@@ -1,0 +1,3 @@
+/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles/Advanced_Graph_Traversal_Visualization.dir
+/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles/edit_cache.dir
+/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles/rebuild_cache.dir
