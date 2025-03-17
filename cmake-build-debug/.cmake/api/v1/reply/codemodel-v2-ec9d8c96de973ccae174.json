@@ -9,7 +9,7 @@
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
-						"string" : "3.25"
+						"string" : "3.17"
 					},
 					"projectIndex" : 0,
 					"source" : ".",
@@ -27,7 +27,7 @@
 					[
 						0
 					],
-					"name" : "Advanced_Graph_Traversal_Visualization",
+					"name" : "main",
 					"targetIndexes" : 
 					[
 						0
@@ -38,9 +38,9 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "Advanced_Graph_Traversal_Visualization::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Advanced_Graph_Traversal_Visualization-Debug-b91c397ab0c0febdaadb.json",
-					"name" : "Advanced_Graph_Traversal_Visualization",
+					"id" : "main::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-main-Debug-d7bd60dadc5b3f791f3e.json",
+					"name" : "main",
 					"projectIndex" : 0
 				}
 			]

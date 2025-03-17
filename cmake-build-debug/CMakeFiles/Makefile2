@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/all
+all: CMakeFiles/main.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/clean
+clean: CMakeFiles/main.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/Advanced_Graph_Traversal_Visualization.dir
+# Target rules for target CMakeFiles/main.dir
 
 # All Build rule for target.
-CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build.make CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build.make CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target Advanced_Graph_Traversal_Visualization"
-.PHONY : CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/all
+CMakeFiles/main.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4 "Built target main"
+.PHONY : CMakeFiles/main.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/all
+CMakeFiles/main.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/main.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles 0
-.PHONY : CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/rule
+.PHONY : CMakeFiles/main.dir/rule
 
 # Convenience name for target.
-Advanced_Graph_Traversal_Visualization: CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/rule
-.PHONY : Advanced_Graph_Traversal_Visualization
+main: CMakeFiles/main.dir/rule
+.PHONY : main
 
 # clean rule for target.
-CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build.make CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/clean
-.PHONY : CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/clean
+CMakeFiles/main.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/clean
+.PHONY : CMakeFiles/main.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

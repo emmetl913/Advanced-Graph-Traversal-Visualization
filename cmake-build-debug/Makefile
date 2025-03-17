@@ -117,24 +117,72 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named Advanced_Graph_Traversal_Visualization
+# Target rules for targets named main
 
 # Build rule for target.
-Advanced_Graph_Traversal_Visualization: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Advanced_Graph_Traversal_Visualization
-.PHONY : Advanced_Graph_Traversal_Visualization
+main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 main
+.PHONY : main
 
 # fast build rule for target.
-Advanced_Graph_Traversal_Visualization/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build.make CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build
-.PHONY : Advanced_Graph_Traversal_Visualization/fast
+main/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+.PHONY : main/fast
+
+common/objloader.o: common/objloader.cpp.o
+.PHONY : common/objloader.o
+
+# target to build an object file
+common/objloader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/common/objloader.cpp.o
+.PHONY : common/objloader.cpp.o
+
+common/objloader.i: common/objloader.cpp.i
+.PHONY : common/objloader.i
+
+# target to preprocess a source file
+common/objloader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/common/objloader.cpp.i
+.PHONY : common/objloader.cpp.i
+
+common/objloader.s: common/objloader.cpp.s
+.PHONY : common/objloader.s
+
+# target to generate assembly for a file
+common/objloader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/common/objloader.cpp.s
+.PHONY : common/objloader.cpp.s
+
+common/utils.o: common/utils.cpp.o
+.PHONY : common/utils.o
+
+# target to build an object file
+common/utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/common/utils.cpp.o
+.PHONY : common/utils.cpp.o
+
+common/utils.i: common/utils.cpp.i
+.PHONY : common/utils.i
+
+# target to preprocess a source file
+common/utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/common/utils.cpp.i
+.PHONY : common/utils.cpp.i
+
+common/utils.s: common/utils.cpp.s
+.PHONY : common/utils.s
+
+# target to generate assembly for a file
+common/utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/common/utils.cpp.s
+.PHONY : common/utils.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build.make CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -142,7 +190,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build.make CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -150,7 +198,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/build.make CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -161,7 +209,13 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... Advanced_Graph_Traversal_Visualization"
+	@echo "... main"
+	@echo "... common/objloader.o"
+	@echo "... common/objloader.i"
+	@echo "... common/objloader.s"
+	@echo "... common/utils.o"
+	@echo "... common/utils.i"
+	@echo "... common/utils.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

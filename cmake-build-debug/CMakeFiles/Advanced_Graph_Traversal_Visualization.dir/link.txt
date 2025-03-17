@@ -1,1 +1,1 @@
-/usr/bin/c++ -g CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/main.cpp.o -o Advanced_Graph_Traversal_Visualization 
+/usr/bin/c++ -g CMakeFiles/Advanced_Graph_Traversal_Visualization.dir/main.cpp.o -o Advanced_Graph_Traversal_Visualization   -L/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/common 
