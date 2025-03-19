@@ -6,13 +6,28 @@
 			[
 				{
 					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.17"
 					},
 					"projectIndex" : 0,
-					"source" : ".",
+					"source" : "."
+				},
+				{
+					"build" : "3D_Graph_Nav/bin",
+					"jsonFile" : "directory-3D_Graph_Nav.bin-Debug-1257ace391692fb80bc8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.17"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "3D_Graph_Nav",
 					"targetIndexes" : 
 					[
 						0
@@ -23,11 +38,23 @@
 			"projects" : 
 			[
 				{
+					"childIndexes" : 
+					[
+						1
+					],
 					"directoryIndexes" : 
 					[
 						0
 					],
+					"name" : "Advanced-Graph-Traversal-Visualization"
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
 					"name" : "main",
+					"parentIndex" : 0,
 					"targetIndexes" : 
 					[
 						0
@@ -37,11 +64,11 @@
 			"targets" : 
 			[
 				{
-					"directoryIndex" : 0,
-					"id" : "main::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-main-Debug-d7bd60dadc5b3f791f3e.json",
+					"directoryIndex" : 1,
+					"id" : "main::@c3d97bb8fd260f6457b7",
+					"jsonFile" : "target-main-Debug-2420e2371558f8f1d72f.json",
 					"name" : "main",
-					"projectIndex" : 0
+					"projectIndex" : 1
 				}
 			]
 		}

@@ -15,6 +15,15 @@
 ########################
 
 //Value Computed by CMake
+Advanced-Graph-Traversal-Visualization_BINARY_DIR:STATIC=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug
+
+//Value Computed by CMake
+Advanced-Graph-Traversal-Visualization_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+Advanced-Graph-Traversal-Visualization_SOURCE_DIR:STATIC=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization
+
+//Value Computed by CMake
 Advanced_Graph_Traversal_Visualization_BINARY_DIR:STATIC=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug
 
 //Value Computed by CMake
@@ -157,7 +166,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=main
+CMAKE_PROJECT_NAME:STATIC=Advanced-Graph-Traversal-Visualization
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -246,13 +255,13 @@ OPENGL_opengl_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libOpenGL.so
 OPENGL_xmesa_INCLUDE_DIR:PATH=OPENGL_xmesa_INCLUDE_DIR-NOTFOUND
 
 //Value Computed by CMake
-main_BINARY_DIR:STATIC=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug
+main_BINARY_DIR:STATIC=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/3D_Graph_Nav/bin
 
 //Value Computed by CMake
-main_IS_TOP_LEVEL:STATIC=ON
+main_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-main_SOURCE_DIR:STATIC=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization
+main_SOURCE_DIR:STATIC=/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/3D_Graph_Nav
 
 
 ########################
@@ -357,7 +366,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=2
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

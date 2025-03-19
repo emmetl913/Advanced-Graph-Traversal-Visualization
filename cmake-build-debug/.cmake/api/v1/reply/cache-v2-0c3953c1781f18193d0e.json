@@ -2,6 +2,42 @@
 	"entries" : 
 	[
 		{
+			"name" : "Advanced-Graph-Traversal-Visualization_BINARY_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug"
+		},
+		{
+			"name" : "Advanced-Graph-Traversal-Visualization_IS_TOP_LEVEL",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "ON"
+		},
+		{
+			"name" : "Advanced-Graph-Traversal-Visualization_SOURCE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization"
+		},
+		{
 			"name" : "Advanced_Graph_Traversal_Visualization_BINARY_DIR",
 			"properties" : 
 			[
@@ -803,7 +839,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "1"
+			"value" : "2"
 		},
 		{
 			"name" : "CMAKE_OBJCOPY",
@@ -883,7 +919,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "main"
+			"value" : "Advanced-Graph-Traversal-Visualization"
 		},
 		{
 			"name" : "CMAKE_RANLIB",
@@ -1327,7 +1363,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug"
+			"value" : "/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/3D_Graph_Nav/bin"
 		},
 		{
 			"name" : "main_IS_TOP_LEVEL",
@@ -1339,7 +1375,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "ON"
+			"value" : "OFF"
 		},
 		{
 			"name" : "main_SOURCE_DIR",
@@ -1351,7 +1387,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization"
+			"value" : "/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/3D_Graph_Nav"
 		}
 	],
 	"kind" : "cache",

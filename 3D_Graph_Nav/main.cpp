@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <vector>
-#include "common/vgl.h"
-#include "common/objloader.h"
-#include "common/utils.h"
-#include "common/vmath.h"
+#include "../common/vgl.h"
+#include "../common/objloader.h"
+#include "../common/utils.h"
+#include "../common/vmath.h"
 #include "lighting.h"
 #define DEG2RAD (M_PI/180.0)
 

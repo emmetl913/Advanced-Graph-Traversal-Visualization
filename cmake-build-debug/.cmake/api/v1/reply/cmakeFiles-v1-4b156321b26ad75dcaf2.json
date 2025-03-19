@@ -122,6 +122,9 @@
 			"path" : "/usr/share/cmake-3.25/Modules/CMakeCommonLanguageInclude.cmake"
 		},
 		{
+			"path" : "3D_Graph_Nav/CMakeLists.txt"
+		},
+		{
 			"isCMake" : true,
 			"isExternal" : true,
 			"path" : "/usr/share/cmake-3.25/Modules/FindOpenGL.cmake"

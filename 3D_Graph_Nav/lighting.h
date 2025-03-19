@@ -1,4 +1,4 @@
-#include "common/vmath.h"
+#include "../common/vmath.h"
 
 enum LightType {OFF, DIRECTIONAL, POINT, SPOT};
 
