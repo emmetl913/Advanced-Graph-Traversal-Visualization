@@ -101,7 +101,7 @@ StyleCopReport.xml
 # Chutzpah Test files
 _Chutzpah*
 
-/.cmake*
+.cmake/*
 
 # Visual C++ cache files
 ipch/
