@@ -128,6 +128,7 @@ void build_geometry( );
 void build_materials( );
 void build_lights( );
 void build_shadows( );
+void loop(GLFWwindow *window);
 void load_model(const char * filename, GLuint obj);
 void draw_mat_shadow_object(GLuint obj, GLuint material);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -210,6 +211,15 @@ int main(int argc, char**argv)
     eye = vec3(x, y, z);
 
     // Start loop
+    loop(window);
+
+    // Close window
+    glfwTerminate();
+    return 0;
+}
+
+void loop(GLFWwindow *window)
+{
     while ( !glfwWindowShouldClose( window ) ) {
         // TODO: Create shadow buffer (cull front faces)
         glCullFace(GL_FRONT);
@@ -217,8 +227,8 @@ int main(int argc, char**argv)
         glCullFace(GL_BACK);
         // Uncomment instead of display() to view shadow buffer for debugging
         //renderQuad();
-    	// Draw graphics
-    	display();
+        // Draw graphics
+        display();
         // Update other events like input handling
         glfwPollEvents();
         GLdouble curTime = glfwGetTime();
@@ -229,10 +239,6 @@ int main(int argc, char**argv)
         // Swap buffer onto screen
         glfwSwapBuffers( window );
     }
-
-    // Close window
-    glfwTerminate();
-    return 0;
 }
 
 void display( )
