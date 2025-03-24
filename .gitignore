@@ -399,3 +399,4 @@ DartConfiguration.tcl
 *.stackdump
 *.log
 /cmake-build-debug
+/cmake-build-debug/.cmake/api/v1/reply
