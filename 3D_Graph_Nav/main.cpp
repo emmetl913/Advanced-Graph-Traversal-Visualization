@@ -107,10 +107,13 @@ GLfloat azimuth = 90.0f;
 GLfloat daz = 2.0f;
 GLfloat elevation = 45.0f;
 GLfloat del = 2.0f;
-GLfloat radius = 6.0f;
+GLfloat radius = 12.0f;
 GLfloat dr = 0.1f;
 GLfloat min_radius = 2.0f;
 bool anim = true;
+
+// Cube Position
+vec3 cube_pos = {7.0f, 0.5f,7.0f};
 
 // Global object variables
 GLfloat sphere_angle = 0.0;
@@ -225,17 +228,20 @@ void loop(GLFWwindow *window)
         glCullFace(GL_FRONT);
         create_shadows();
         glCullFace(GL_BACK);
+
         // Uncomment instead of display() to view shadow buffer for debugging
         //renderQuad();
+
         // Draw graphics
         display();
+
+
         // Update other events like input handling
         glfwPollEvents();
         GLdouble curTime = glfwGetTime();
-        if (anim) {
-            sphere_angle += (curTime - elTime) * (rpm / 60.0) * 360.0;
-        }
         elTime = curTime;
+
+
         // Swap buffer onto screen
         glfwSwapBuffers( window );
     }
@@ -283,41 +289,42 @@ void render_scene() {
     mat4 rot_matrix = mat4().identity();
     mat4 trans_matrix = mat4().identity();
 
-
-    // Set cube transformation matrix
-    trans_matrix = translate(0.0f, -0.1f, 0.0f);
-    scale_matrix = scale(10.0f, 0.2f, 10.0f);
-    model_matrix = trans_matrix*scale_matrix;
-    if (!shadow) {
-        // Set normal matrix for phong shadow shader
-        normal_matrix = model_matrix.inverse().transpose();
+    rot_matrix = rotate(180.0f, vec3(1.0f, 0.0f, 0.0f));
+    for (int i = -7; i <= 7; ++i) {
+        for (int j = -7; j <= 7; ++j) {
+            trans_matrix = translate((float)i, -0.1f, (float)j);
+            scale_matrix = scale(0.9f, 0.2f, 0.9f);
+            model_matrix = trans_matrix * scale_matrix * rot_matrix;
+            if (!shadow) {
+                normal_matrix = model_matrix.inverse().transpose();
+            }
+            draw_mat_shadow_object(Cube, Brass);
+        }
     }
-    // TODO: Draw cube
-    draw_mat_shadow_object(Cube, Brass);
 
-    // Set sphere transformation matrix
-    trans_matrix = translate(1.0f, 2.0f, 1.0f);
+    // Set cube transformation matrix for the floor
+    // trans_matrix = translate(0.0f, -0.1f, 0.0f);
+    // scale_matrix = scale(15.0f, 0.2f, 15.0f);
+    // model_matrix = trans_matrix*scale_matrix;
+    // if (!shadow) {
+    //     // Set normal matrix for phong shadow shader
+    //     normal_matrix = model_matrix.inverse().transpose();
+    // }
+    // // TODO: Draw cube
+    // draw_mat_shadow_object(Cube, Brass);
+
+    // Set Cube transformation matrix
+    trans_matrix = translate(cube_pos);
     rot_matrix = rotate(sphere_angle, vec3(0.0f, 1.0f, 0.0f));
-    scale_matrix = scale(0.5f, 0.5f, 0.5f);
+    scale_matrix = scale(1.0f, 1.0f, 1.0f);
     model_matrix = rot_matrix*trans_matrix*scale_matrix;
     if (!shadow) {
         // Set normal matrix for phong shadow shader
         normal_matrix = model_matrix.inverse().transpose();
     }
-    // TODO: Draw sphere
-    draw_mat_shadow_object(Sphere, RedPlastic);
+    draw_mat_shadow_object(Cube, RedPlastic);
 
-    // Set torus transformation matrix
-    trans_matrix = translation(0.0f, 1.0f, 0.0f);
-    rot_matrix = rotation(0.0f, 0.0f, 0.0f, 1.0f);
-    scale_matrix = scale(1.5f, 0.5f, 1.5f);
-    model_matrix = trans_matrix*rot_matrix*scale_matrix;
-    if (!shadow) {
-        // Set normal matrix for phong shadow shader
-        normal_matrix = model_matrix.inverse().transpose();
-    }
-    // TODO: Draw torus
-    draw_mat_shadow_object(Torus, RedPlastic);
+
 
     // Draw sphere for light position (without shadow)
     if (!shadow) {
@@ -331,6 +338,7 @@ void render_scene() {
     }
 
 }
+
 
 void create_shadows(){
     // TODO: Set shadow projection matrix
@@ -412,8 +420,22 @@ void build_lights( ) {
             {0.0f, 0.0f}  //pad2
     };
 
+    LightProperties sunLight = {
+        DIRECTIONAL, // type
+        {0.0f, 0.0f, 0.0f}, // pad
+        vec4(0.2f, 0.2f, 0.2f, 1.0f), // ambient
+        vec4(1.0f, 1.0f, 0.9f, 1.0f), // diffuse
+        vec4(1.0f, 1.0f, 0.9f, 1.0f), // specular
+        vec4(0.0f, 0.0f, 0.0f, 1.0f), // position (not used for directional light)
+        vec4(-0.5f, -1.0f, -0.5f, 0.0f), // direction
+        0.0f, // cutoff (not used for directional light)
+        0.0f, // exponent (not used for directional light)
+        {0.0f, 0.0f} // pad2
+    };
+
     // Add lights to Lights vector
     Lights.push_back(whiteSpotLight);
+    Lights.push_back(sunLight);
 
     // Set numLights
     numLights = Lights.size();
@@ -600,6 +622,24 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         if (radius < min_radius)
         {
             radius = min_radius;
+        }
+    }
+
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+        if (cube_pos[2] > -7.0f) {
+            cube_pos[2] -= 1.0f;
+        }
+    } else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+        if (cube_pos[2] < 7.0f) {
+            cube_pos[2] += 1.0f;
+        }
+    } else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+        if (cube_pos[0] > -7.0f) {
+            cube_pos[0] -= 1.0f;
+        }
+    } else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+        if (cube_pos[0] < 7.0f) {
+            cube_pos[0] += 1.0f;
         }
     }
 
