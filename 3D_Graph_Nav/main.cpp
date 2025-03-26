@@ -293,16 +293,18 @@ void render_scene() {
     mat4 trans_matrix = mat4().identity();
 
 
-    // Set cube transformation matrix
-    trans_matrix = translate(0.0f, -0.1f, 0.0f);
-    scale_matrix = scale(10.0f, 0.2f, 10.0f);
-    model_matrix = trans_matrix*scale_matrix;
-    if (!shadow) {
-        // Set normal matrix for phong shadow shader
-        normal_matrix = model_matrix.inverse().transpose();
+    rot_matrix = rotate(180.0f, vec3(1.0f, 0.0f, 0.0f));
+    for (int i = -grid_height; i <= grid_height; ++i) {
+        for (int j = -grid_width; j <= grid_width; ++j) {
+            trans_matrix = translate((float)i, -0.1f, (float)j);
+            scale_matrix = scale(0.9f, 0.2f, 0.9f);
+            model_matrix = trans_matrix * scale_matrix * rot_matrix;
+            if (!shadow) {
+                normal_matrix = model_matrix.inverse().transpose();
+            }
+            draw_mat_shadow_object(Cube, Brass);
+        }
     }
-    // TODO: Draw cube
-    draw_mat_shadow_object(Cube, Brass);
 
     // Set cube transformation matrix for the floor
     // trans_matrix = translate(0.0f, -0.1f, 0.0f);
@@ -677,6 +679,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // Debug shadow renderer
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
+
 void renderQuad()
 {
     // reset viewport

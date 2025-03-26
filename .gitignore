@@ -364,9 +364,6 @@ MigrationBackup/
 .ionide/
 
 # Fody - auto-generated XML schema
-<<<<<<< Updated upstream
-FodyWeavers.xsd
-=======
 FodyWeavers.xsd
 
 # Build directory
@@ -405,7 +402,6 @@ DartConfiguration.tcl
 /cmake-build-debug/.cmake/api/v1/reply
 .idea/editor.xml
 3D_Graph_Nav/bin/main
->>>>>>> Stashed changes
 
 
 # Build directory
