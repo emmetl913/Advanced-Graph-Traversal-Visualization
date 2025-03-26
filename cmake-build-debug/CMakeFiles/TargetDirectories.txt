@@ -1,5 +1,0 @@
-/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles/edit_cache.dir
-/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/3D_Graph_Nav/bin/CMakeFiles/main.dir
-/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/3D_Graph_Nav/bin/CMakeFiles/edit_cache.dir
-/mnt/c/Users/elars/Documents/GitHub/Advanced-Graph-Traversal-Visualization/cmake-build-debug/3D_Graph_Nav/bin/CMakeFiles/rebuild_cache.dir

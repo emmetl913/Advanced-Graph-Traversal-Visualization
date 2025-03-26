@@ -3,6 +3,8 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+cmake-build-debug/
+
 # User-specific files
 *.rsuser
 *.suo
@@ -100,6 +102,8 @@ StyleCopReport.xml
 
 # Chutzpah Test files
 _Chutzpah*
+
+.cmake/*
 
 # Visual C++ cache files
 ipch/
@@ -402,3 +406,39 @@ DartConfiguration.tcl
 .idea/editor.xml
 3D_Graph_Nav/bin/main
 >>>>>>> Stashed changes
+
+
+# Build directory
+build/
+out/
+/cmake-build-*
+
+# CMake-specific files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Executables
+*.exe
+*.out
+
+# Libraries
+*.lib
+*.so
+*.dylib
+*.a
+
+# Object files
+*.o
+
+# Packaging related
+_CPackConfig.cmake
+_CPackProperties.cmake
+CPackLog.txt
+DartConfiguration.tcl
+
+# Other
+*.stackdump
+*.log
+/cmake-build-debug
+/cmake-build-debug/.cmake/api/v1/reply
