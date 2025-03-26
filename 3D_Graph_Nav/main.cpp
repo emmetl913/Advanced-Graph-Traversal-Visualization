@@ -121,8 +121,11 @@ vec3 axis = {0.0f, 1.0f, 0.0f};
 // Global screen dimensions
 GLint ww,hh;
 
+int grid_height = 10, grid_width = 10;
+
 void display( );
 void render_scene( );
+void setup_walls( );
 void create_shadows( );
 void build_geometry( );
 void build_materials( );
@@ -283,6 +286,7 @@ void render_scene() {
     mat4 rot_matrix = mat4().identity();
     mat4 trans_matrix = mat4().identity();
 
+<<<<<<< Updated upstream
 
     // Set cube transformation matrix
     trans_matrix = translate(0.0f, -0.1f, 0.0f);
@@ -291,6 +295,19 @@ void render_scene() {
     if (!shadow) {
         // Set normal matrix for phong shadow shader
         normal_matrix = model_matrix.inverse().transpose();
+=======
+    rot_matrix = rotate(180.0f, vec3(1.0f, 0.0f, 0.0f));
+    for (int i = -grid_height; i <= grid_height; ++i) {
+        for (int j = -grid_width; j <= grid_width; ++j) {
+            trans_matrix = translate((float)i, -0.1f, (float)j);
+            scale_matrix = scale(0.9f, 0.2f, 0.9f);
+            model_matrix = trans_matrix * scale_matrix * rot_matrix;
+            if (!shadow) {
+                normal_matrix = model_matrix.inverse().transpose();
+            }
+            draw_mat_shadow_object(Cube, Brass);
+        }
+>>>>>>> Stashed changes
     }
     // TODO: Draw cube
     draw_mat_shadow_object(Cube, Brass);
@@ -332,6 +349,14 @@ void render_scene() {
 
 }
 
+<<<<<<< Updated upstream
+=======
+void setup_walls()
+{
+
+}
+
+>>>>>>> Stashed changes
 void create_shadows(){
     // TODO: Set shadow projection matrix
     shadow_proj_matrix = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
