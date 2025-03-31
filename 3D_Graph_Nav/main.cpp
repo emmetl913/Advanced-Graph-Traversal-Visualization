@@ -105,7 +105,7 @@ GLint lightOn[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 // Spherical camera state
 GLfloat azimuth = 90.0f;
 GLfloat daz = 2.0f;
-GLfloat elevation = 45.0f;
+GLfloat elevation = 1.0f;
 GLfloat del = 2.0f;
 GLfloat radius = 12.0f;
 GLfloat dr = 0.1f;
@@ -121,14 +121,27 @@ GLdouble elTime = 0.0;
 GLdouble rpm = 10.0;
 vec3 axis = {0.0f, 1.0f, 0.0f};
 
+
+
 // Global screen dimensions
 GLint ww,hh;
 
-int grid_height = 10, grid_width = 10;
+const int grid_height = 10;
+const int grid_width = 10;
+
+// This is the locations of the walls in the grid
+// 0 in the array represents a space that can be moved to
+// 1 in the array represents a space where a wall is
+// 2 in the array represents the player
+// 3 in the array represents the goal
+// good luck and god bless
+int wall_loc[grid_height*2][grid_width*2] = {0};
 
 void display( );
 void render_scene( );
+void print_wall_array( );
 void setup_walls( );
+void validate_input( );
 void create_shadows( );
 void build_geometry( );
 void build_materials( );
@@ -145,7 +158,7 @@ void renderQuad();
 int main(int argc, char**argv)
 {
 	// Create OpenGL window
-	GLFWwindow* window = CreateWindow("Shadow Mesh");
+	GLFWwindow* window = CreateWindow("Pathfinding");
     if (!window) {
         fprintf(stderr, "ERROR: could not open window with GLFW3\n");
         glfwTerminate();
@@ -170,6 +183,8 @@ int main(int argc, char**argv)
     build_lights();
     // Create shadow buffer
     build_shadows();
+    // Build walls
+    setup_walls();
 
     // Load shaders
     // Load light shader with shadows
@@ -294,10 +309,16 @@ void render_scene() {
 
 
     rot_matrix = rotate(180.0f, vec3(1.0f, 0.0f, 0.0f));
-    for (int i = -grid_height; i <= grid_height; ++i) {
-        for (int j = -grid_width; j <= grid_width; ++j) {
+    for (int i = -grid_height; i < grid_height; ++i) {
+        for (int j = -grid_width; j < grid_width; ++j) {
             trans_matrix = translate((float)i, -0.1f, (float)j);
-            scale_matrix = scale(0.9f, 0.2f, 0.9f);
+            if(wall_loc[i+grid_height][j+grid_width] == 1)
+            {
+                scale_matrix = scale(0.9f, 2.0f, 0.9f);
+            } else
+            {
+                scale_matrix = scale(0.9f, 0.2f, 0.9f);
+            }
             model_matrix = trans_matrix * scale_matrix * rot_matrix;
             if (!shadow) {
                 normal_matrix = model_matrix.inverse().transpose();
@@ -306,18 +327,7 @@ void render_scene() {
         }
     }
 
-    // Set cube transformation matrix for the floor
-    // trans_matrix = translate(0.0f, -0.1f, 0.0f);
-    // scale_matrix = scale(15.0f, 0.2f, 15.0f);
-    // model_matrix = trans_matrix*scale_matrix;
-    // if (!shadow) {
-    //     // Set normal matrix for phong shadow shader
-    //     normal_matrix = model_matrix.inverse().transpose();
-    // }
-    // // TODO: Draw cube
-    // draw_mat_shadow_object(Cube, Brass);
-
-    // Set Cube transformation matrix
+    // Set Player transformation matrix
     trans_matrix = translate(cube_pos);
     rot_matrix = rotate(sphere_angle, vec3(0.0f, 1.0f, 0.0f));
     scale_matrix = scale(1.0f, 1.0f, 1.0f);
@@ -343,10 +353,41 @@ void render_scene() {
 
 }
 
-
 void setup_walls()
 {
+    // Prepopulate the wall_loc array with no walls
+    for (int i = 0; i < grid_height; ++i) {
+        for (int j = 0; j < grid_width; ++j) {
+            wall_loc[i][j] = 0;
+        }
+    }
+    printf("Prepopulated empty wall_loc array\n");
+    print_wall_array();
+    /*
+     * This is the location where the maze creation
+     * algorithm will go once that is figured out.
+     * For now, walls will be generated at random
+     */
 
+    for (int i = -grid_height; i <= grid_height; ++i) {
+        for (int j = -grid_width; j <= grid_width; ++j) {
+            if (i == -grid_height || i == grid_height-1 || j == -grid_width || j == grid_width-1) {
+                wall_loc[i+grid_height][j+grid_width] = 1;
+            }
+        }
+    }
+    printf("Generated border walls\n");
+    print_wall_array();
+}
+
+void print_wall_array()
+{
+    for (int i = 0; i < grid_height*2; ++i) {
+        for (int j = 0; j < grid_width*2; ++j) {
+            printf("%d ", wall_loc[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 void create_shadows(){
@@ -416,18 +457,18 @@ void build_materials( ) {
 
 void build_lights( ) {
     // Spot white light
-    LightProperties whiteSpotLight = {
-            SPOT, //type
-            {0.0f, 0.0f, 0.0f}, //pad
-            vec4(0.1f, 0.1f, 0.1f, 1.0f), //ambient
-            vec4(1.0f, 1.0f, 1.0f, 1.0f), //diffuse
-            vec4(1.0f, 1.0f, 1.0f, 1.0f), //specular
-            vec4(5.0f, 5.0f, 5.0f, 1.0f),  //position
-            vec4(-1.0f, -1.0f, -1.0f, 0.0f), //direction
-            30.0f,   //cutoff
-            20.0f,  //exponent
-            {0.0f, 0.0f}  //pad2
-    };
+    // LightProperties whiteSpotLight = {
+    //         SPOT, //type
+    //         {0.0f, 0.0f, 0.0f}, //pad
+    //         vec4(0.1f, 0.1f, 0.1f, 1.0f), //ambient
+    //         vec4(1.0f, 1.0f, 1.0f, 1.0f), //diffuse
+    //         vec4(1.0f, 1.0f, 1.0f, 1.0f), //specular
+    //         vec4(7.50f, 7.50f, 8.0f, 1.0f),  //position
+    //         vec4(-1.0f, -1.0f, -1.0f, 0.0f), //direction
+    //         30.0f,   //cutoff
+    //         20.0f,  //exponent
+    //         {0.0f, 0.0f}  //pad2
+    // };
 
     LightProperties sunLight = {
         DIRECTIONAL, // type
@@ -436,14 +477,14 @@ void build_lights( ) {
         vec4(1.0f, 1.0f, 0.9f, 1.0f), // diffuse
         vec4(1.0f, 1.0f, 0.9f, 1.0f), // specular
         vec4(0.0f, 0.0f, 0.0f, 1.0f), // position (not used for directional light)
-        vec4(-0.5f, -1.0f, -0.5f, 0.0f), // direction
+        vec4(-0.0f, -1.0f, -0.0f, 0.0f), // direction
         0.0f, // cutoff (not used for directional light)
         0.0f, // exponent (not used for directional light)
         {0.0f, 0.0f} // pad2
     };
 
     // Add lights to Lights vector
-    Lights.push_back(whiteSpotLight);
+    //Lights.push_back(whiteSpotLight);
     Lights.push_back(sunLight);
 
     // Set numLights
@@ -634,20 +675,20 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 
-    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-        if (cube_pos[2] > -7.0f) {
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+        if (cube_pos[2] > -grid_height) {
             cube_pos[2] -= 1.0f;
         }
-    } else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-        if (cube_pos[2] < 7.0f) {
+    } else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+        if (cube_pos[2] < grid_height) {
             cube_pos[2] += 1.0f;
         }
-    } else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-        if (cube_pos[0] > -7.0f) {
+    } else if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+        if (cube_pos[0] > -grid_height) {
             cube_pos[0] -= 1.0f;
         }
-    } else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-        if (cube_pos[0] < 7.0f) {
+    } else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+        if (cube_pos[0] < grid_height) {
             cube_pos[0] += 1.0f;
         }
     }
@@ -666,6 +707,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 }
 
 void mouse_callback(GLFWwindow *window, int button, int action, int mods){
+
+}
+
+void validate_input()
+{
 
 }
 
