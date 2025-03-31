@@ -128,6 +128,8 @@ GLint ww,hh;
 
 const int grid_height = 10;
 const int grid_width = 10;
+int player_x = 2;
+int player_y = 17;
 
 // This is the locations of the walls in the grid
 // 0 in the array represents a space that can be moved to
@@ -141,7 +143,7 @@ void display( );
 void render_scene( );
 void print_wall_array( );
 void setup_walls( );
-void validate_input( );
+bool validate_input(int new_x, int new_y);
 void create_shadows( );
 void build_geometry( );
 void build_materials( );
@@ -374,6 +376,9 @@ void setup_walls()
             if (i == -grid_height || i == grid_height-1 || j == -grid_width || j == grid_width-1) {
                 wall_loc[i+grid_height][j+grid_width] = 1;
             }
+            if (i == grid_height-3 && j == -grid_width + 2) {
+                wall_loc[i+grid_height][j+grid_width] = 2;
+            }
         }
     }
     printf("Generated border walls\n");
@@ -388,6 +393,7 @@ void print_wall_array()
         }
         printf("\n");
     }
+    printf("Player position: %d, %d\n", player_x, player_y);
 }
 
 void create_shadows(){
@@ -476,7 +482,7 @@ void build_lights( ) {
         vec4(0.2f, 0.2f, 0.2f, 1.0f), // ambient
         vec4(1.0f, 1.0f, 0.9f, 1.0f), // diffuse
         vec4(1.0f, 1.0f, 0.9f, 1.0f), // specular
-        vec4(0.0f, 0.0f, 0.0f, 1.0f), // position (not used for directional light)
+        vec4(0.0f, 15.0f, 0.0f, 1.0f), // position (not used for directional light)
         vec4(-0.0f, -1.0f, -0.0f, 0.0f), // direction
         0.0f, // cutoff (not used for directional light)
         0.0f, // exponent (not used for directional light)
@@ -675,24 +681,28 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 
-    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS && validate_input(player_x, player_y+1)) {
         if (cube_pos[2] > -grid_height) {
             cube_pos[2] -= 1.0f;
+            player_x += 1;
         }
-    } else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+    } else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && validate_input(player_x, player_y-1)) {
         if (cube_pos[2] < grid_height) {
             cube_pos[2] += 1.0f;
+            player_x -= 1;
         }
-    } else if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+    } else if (key == GLFW_KEY_UP && action == GLFW_PRESS && validate_input(player_x, player_y-1)) {
         if (cube_pos[0] > -grid_height) {
             cube_pos[0] -= 1.0f;
+            player_y -= 1;
         }
-    } else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+    } else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS && validate_input(player_x, player_y+1)) {
         if (cube_pos[0] < grid_height) {
             cube_pos[0] += 1.0f;
+            player_y += 1;
         }
     }
-
+    print_wall_array();
     // Compute updated camera position
     GLfloat x, y, z;
     x = (GLfloat)(radius*sin(azimuth*DEG2RAD)*sin(elevation*DEG2RAD));
@@ -710,9 +720,14 @@ void mouse_callback(GLFWwindow *window, int button, int action, int mods){
 
 }
 
-void validate_input()
+bool validate_input(int new_x, int new_y)
 {
-
+    if (wall_loc[new_x][new_y] != 1)
+    {
+        wall_loc[new_x][new_y] = 2;
+        return true;
+    }
+    return false;
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
