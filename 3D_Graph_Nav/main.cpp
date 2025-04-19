@@ -103,7 +103,7 @@ GLuint numLights = 0;
 GLint lightOn[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // Spherical camera state
-GLfloat azimuth = 90.0f;
+GLfloat azimuth = 180.0f;
 GLfloat daz = 2.0f;
 GLfloat elevation = 1.0f;
 GLfloat del = 2.0f;
@@ -111,9 +111,6 @@ GLfloat radius = 12.0f;
 GLfloat dr = 0.1f;
 GLfloat min_radius = 2.0f;
 bool anim = true;
-
-// Cube Position
-vec3 cube_pos = {7.0f, 0.5f,7.0f};
 
 // Global object variables
 GLfloat sphere_angle = 0.0;
@@ -128,15 +125,18 @@ GLint ww,hh;
 
 const int grid_height = 10;
 const int grid_width = 10;
-int player_x = 2;
-int player_y = 17;
+int player_x = 1;
+int player_y = 1;
+// Cube Position
+vec3 cube_pos = {-grid_height + 1, 0.5f,-grid_width + 1};
+
 
 // This is the locations of the walls in the grid
 // 0 in the array represents a space that can be moved to
 // 1 in the array represents a space where a wall is
 // 2 in the array represents the player
 // 3 in the array represents the goal
-// good luck and god bless
+// good luck and god bless - yes let us bless
 int wall_loc[grid_height*2][grid_width*2] = {0};
 
 void display( );
@@ -370,14 +370,18 @@ void setup_walls()
      * algorithm will go once that is figured out.
      * For now, walls will be generated at random
      */
-
+    int z = 0;
     for (int i = -grid_height; i <= grid_height; ++i) {
         for (int j = -grid_width; j <= grid_width; ++j) {
             if (i == -grid_height || i == grid_height-1 || j == -grid_width || j == grid_width-1) {
                 wall_loc[i+grid_height][j+grid_width] = 1;
             }
-            if (i == grid_height-3 && j == -grid_width + 2) {
-                wall_loc[i+grid_height][j+grid_width] = 2;
+//            if (i == grid_height-3 && j == -grid_width + 2) {
+//                wall_loc[i+grid_height][j+grid_width] = 2;
+//            }
+            else if (z == 0){
+                z++;
+                printf("First safe position is %i,%i", i+grid_height, j+grid_width);
             }
         }
     }
@@ -394,6 +398,32 @@ void print_wall_array()
         printf("\n");
     }
     printf("Player position: %d, %d\n", player_x, player_y);
+}
+//Use this function to check for walls
+bool can_move(int x, int y){
+    //Only allow the player to move into a space with the value 0
+    if (wall_loc[x][y] == 0)
+        return true;
+    return false;
+}
+void move_player(int x, int y){
+    if (can_move(x,y)){
+        wall_loc[x][y] = 2; //Set new position to have player in it.
+        wall_loc[player_x][player_y] = 0; // Update previous position to be empty
+        //Move the player's cube based on whether the x and y are new values
+        if (player_x != x){
+            cube_pos[0] += float(x) - float(player_x);
+            player_x = x;
+        }
+        if (player_y != y){
+            cube_pos[2] += float(y) - float(player_y);
+            player_y = y;
+        }
+    }
+    else{
+        printf("There is a wall here. The player cannot move here");
+    }
+
 }
 
 void create_shadows(){
@@ -681,26 +711,15 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 
-    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS && validate_input(player_x, player_y+1)) {
-        if (cube_pos[2] > -grid_height) {
-            cube_pos[2] -= 1.0f;
-            player_x += 1;
-        }
-    } else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && validate_input(player_x, player_y-1)) {
-        if (cube_pos[2] < grid_height) {
-            cube_pos[2] += 1.0f;
-            player_x -= 1;
-        }
-    } else if (key == GLFW_KEY_UP && action == GLFW_PRESS && validate_input(player_x, player_y-1)) {
-        if (cube_pos[0] > -grid_height) {
-            cube_pos[0] -= 1.0f;
-            player_y -= 1;
-        }
-    } else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS && validate_input(player_x, player_y+1)) {
-        if (cube_pos[0] < grid_height) {
-            cube_pos[0] += 1.0f;
-            player_y += 1;
-        }
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS){
+        printf("Pressing right, cube_pos[2] == %f, -grid_height == %i", cube_pos[2], -grid_height);
+        move_player(player_x - 1, player_y);
+    } else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS){
+        move_player(player_x + 1, player_y);
+    } else if (key == GLFW_KEY_UP && action == GLFW_PRESS){
+        move_player(player_x, player_y + 1);
+    } else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS){
+        move_player(player_x, player_y - 1);
     }
     print_wall_array();
     // Compute updated camera position
@@ -718,16 +737,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 void mouse_callback(GLFWwindow *window, int button, int action, int mods){
 
-}
-
-bool validate_input(int new_x, int new_y)
-{
-    if (wall_loc[new_x][new_y] != 1)
-    {
-        wall_loc[new_x][new_y] = 2;
-        return true;
-    }
-    return false;
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
