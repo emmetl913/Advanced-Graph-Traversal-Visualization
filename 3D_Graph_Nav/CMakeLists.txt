@@ -53,6 +53,7 @@ else()
     target_link_libraries(${PROJECT_NAME} OpenGL::GL)
     target_link_libraries(${PROJECT_NAME} glfw)
     target_link_libraries(${PROJECT_NAME} GLEW)
+    target_link_libraries(${PROJECT_NAME} pthread)
 endif()
 
 
