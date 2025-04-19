@@ -5,6 +5,13 @@
 #include "../common/utils.h"
 #include "../common/vmath.h"
 #include "lighting.h"
+#include "deque"
+#include <chrono>
+#include <thread>
+#include <mutex>
+
+
+
 #define DEG2RAD (M_PI/180.0)
 
 using namespace vmath;
@@ -129,7 +136,11 @@ int player_x = 1;
 int player_y = 1;
 // Cube Position
 vec3 cube_pos = {-grid_height + 1, 0.5f,-grid_width + 1};
-
+//Used to iterate over the movement history generated from an algorithm.
+//Deque allows us to add to back and pop from front in O(1)
+std::deque<std::pair<int, int>> movement_history;
+std::mutex replay_mutex;
+bool is_replay_active = false;
 
 // This is the locations of the walls in the grid
 // 0 in the array represents a space that can be moved to
@@ -354,7 +365,9 @@ void render_scene() {
     }
 
 }
-
+void sleep(int milliseconds){
+    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
 void setup_walls()
 {
     // Prepopulate the wall_loc array with no walls
@@ -370,21 +383,15 @@ void setup_walls()
      * algorithm will go once that is figured out.
      * For now, walls will be generated at random
      */
-    int z = 0;
     for (int i = -grid_height; i <= grid_height; ++i) {
         for (int j = -grid_width; j <= grid_width; ++j) {
             if (i == -grid_height || i == grid_height-1 || j == -grid_width || j == grid_width-1) {
                 wall_loc[i+grid_height][j+grid_width] = 1;
             }
-//            if (i == grid_height-3 && j == -grid_width + 2) {
-//                wall_loc[i+grid_height][j+grid_width] = 2;
-//            }
-            else if (z == 0){
-                z++;
-                printf("First safe position is %i,%i", i+grid_height, j+grid_width);
-            }
         }
     }
+    //Add player position
+    wall_loc[player_x][player_y] = 2;
     printf("Generated border walls\n");
     print_wall_array();
 }
@@ -399,32 +406,7 @@ void print_wall_array()
     }
     printf("Player position: %d, %d\n", player_x, player_y);
 }
-//Use this function to check for walls
-bool can_move(int x, int y){
-    //Only allow the player to move into a space with the value 0
-    if (wall_loc[x][y] == 0)
-        return true;
-    return false;
-}
-void move_player(int x, int y){
-    if (can_move(x,y)){
-        wall_loc[x][y] = 2; //Set new position to have player in it.
-        wall_loc[player_x][player_y] = 0; // Update previous position to be empty
-        //Move the player's cube based on whether the x and y are new values
-        if (player_x != x){
-            cube_pos[0] += float(x) - float(player_x);
-            player_x = x;
-        }
-        if (player_y != y){
-            cube_pos[2] += float(y) - float(player_y);
-            player_y = y;
-        }
-    }
-    else{
-        printf("There is a wall here. The player cannot move here");
-    }
 
-}
 
 void create_shadows(){
     // TODO: Set shadow projection matrix
@@ -654,7 +636,97 @@ void draw_mat_shadow_object(GLuint obj, GLuint material){
     // Draw object
     glDrawArrays(GL_TRIANGLES, 0, numVertices[obj]);
 }
+//Use this function to check for walls
+bool can_move(int x, int y){
+    //Only allow the player to move into a space with the value 0
+    if (wall_loc[x][y] == 0)
+        return true;
+    return false;
+}
+void move_player(int x, int y){
+    if (can_move(x,y)){
+        wall_loc[x][y] = 2; //Set new position to have player in it.
+        wall_loc[player_x][player_y] = 0; // Update previous position to be empty
+        //Move the player's cube based on whether the x and y are new values
+        if (player_x != x){
+            cube_pos[0] += float(x) - float(player_x);
+            player_x = x;
+        }
+        if (player_y != y){
+            cube_pos[2] += float(y) - float(player_y);
+            player_y = y;
+        }
+    }
+    else{
+        printf("There is a wall here. The player cannot move here");
+    }
 
+}
+void generate_spiral_movement() {
+    int top = 0;
+    int bottom = grid_height * 2 - 2;
+    int left = 0;
+    int right = grid_width * 2 - 2;
+
+    while (top <= bottom && left <= right) {
+        // Traverse from left to right along the top row
+        for (int j = left; j <= right; ++j) {
+            movement_history.emplace_back(top, j);
+        }
+        ++top; // Move the top boundary down
+
+        // Traverse from top to bottom along the right column
+        for (int i = top; i <= bottom; ++i) {
+            movement_history.emplace_back(i, right);
+        }
+        --right; // Move the right boundary left
+
+        // Traverse from right to left along the bottom row (if still within bounds)
+        if (top <= bottom) {
+            for (int j = right; j >= left; --j) {
+                movement_history.emplace_back(bottom, j);
+            }
+            --bottom; // Move the bottom boundary up
+        }
+
+        // Traverse from bottom to top along the left column (if still within bounds)
+        if (left <= right) {
+            for (int i = bottom; i >= top; --i) {
+                movement_history.emplace_back(i, left);
+            }
+            ++left; // Move the left boundary right
+        }
+    }
+}
+void replay_movement_thread(std::deque<std::pair<int, int>> q) {
+    {
+        std::lock_guard<std::mutex> lock(replay_mutex);
+        if (is_replay_active) {
+            return; // Exit if a replay is already active
+        }
+        is_replay_active = true;
+    }
+
+    while (!q.empty()) {
+        std::pair<int, int> p = q.front();
+        q.pop_front();
+        move_player(p.first, p.second);
+        sleep(25);
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(replay_mutex);
+        is_replay_active = false; // Mark replay as finished
+    }
+}
+
+void start_replay() {
+    std::lock_guard<std::mutex> lock(replay_mutex);
+    if (!is_replay_active) {
+        std::thread replay_thread(replay_movement_thread, movement_history);
+        replay_thread.detach(); // Detach the thread to let it run independently
+    }
+}
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     // ESC closes window
     if (key == GLFW_KEY_ESCAPE) {
@@ -711,14 +783,13 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 
-    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS){
-        printf("Pressing right, cube_pos[2] == %f, -grid_height == %i", cube_pos[2], -grid_height);
+    if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)){
         move_player(player_x - 1, player_y);
-    } else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS){
+    } else if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)){
         move_player(player_x + 1, player_y);
-    } else if (key == GLFW_KEY_UP && action == GLFW_PRESS){
+    } else if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)){
         move_player(player_x, player_y + 1);
-    } else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS){
+    } else if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)){
         move_player(player_x, player_y - 1);
     }
     print_wall_array();
@@ -733,7 +804,14 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
         lightOn[WhiteSpotLight] = (lightOn[WhiteSpotLight]+1)%2;
     }
+
+    if (key == GLFW_KEY_P && action == GLFW_PRESS){
+        generate_spiral_movement();
+        start_replay();
+    }
 }
+
+
 
 void mouse_callback(GLFWwindow *window, int button, int action, int mods){
 
