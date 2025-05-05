@@ -4,6 +4,7 @@
 #include "../common/objloader.h"
 #include "../common/utils.h"
 #include "../common/vmath.h"
+#include "depth_first_search.h"
 #include "lighting.h"
 #include "deque"
 #include <chrono>
@@ -130,8 +131,8 @@ vec3 axis = {0.0f, 1.0f, 0.0f};
 // Global screen dimensions
 GLint ww,hh;
 
-const int grid_height = 10;
-const int grid_width = 10;
+const int grid_height = 7;
+const int grid_width = 7;
 int player_x = 1;
 int player_y = 1;
 // Cube Position
@@ -154,7 +155,6 @@ void display( );
 void render_scene( );
 void print_wall_array( );
 void setup_walls( );
-bool validate_input(int new_x, int new_y);
 void create_shadows( );
 void build_geometry( );
 void build_materials( );
@@ -322,21 +322,27 @@ void render_scene() {
 
 
     rot_matrix = rotate(180.0f, vec3(1.0f, 0.0f, 0.0f));
+    bool isWall = false;
     for (int i = -grid_height; i < grid_height; ++i) {
         for (int j = -grid_width; j < grid_width; ++j) {
             trans_matrix = translate((float)i, -0.1f, (float)j);
             if(wall_loc[i+grid_height][j+grid_width] == 1)
             {
                 scale_matrix = scale(0.9f, 2.0f, 0.9f);
+                isWall = true;
             } else
             {
                 scale_matrix = scale(0.9f, 0.2f, 0.9f);
+                isWall = false;
             }
             model_matrix = trans_matrix * scale_matrix * rot_matrix;
             if (!shadow) {
                 normal_matrix = model_matrix.inverse().transpose();
             }
-            draw_mat_shadow_object(Cube, Brass);
+            if (isWall)
+                draw_mat_shadow_object(Cube, Brass);
+            else
+                draw_mat_shadow_object(Cube, RedPlastic);
         }
     }
 
@@ -378,18 +384,30 @@ void setup_walls()
     }
     printf("Prepopulated empty wall_loc array\n");
     print_wall_array();
+
     /*
      * This is the location where the maze creation
      * algorithm will go once that is figured out.
      * For now, walls will be generated at random
      */
-    for (int i = -grid_height; i <= grid_height; ++i) {
-        for (int j = -grid_width; j <= grid_width; ++j) {
-            if (i == -grid_height || i == grid_height-1 || j == -grid_width || j == grid_width-1) {
-                wall_loc[i+grid_height][j+grid_width] = 1;
-            }
+    //Unfinished maze algorithm DFS
+    depth_first_search d = depth_first_search(player_x,player_y,grid_width,grid_height);
+    d.traverse(player_x,player_y,0);
+//    for (int i = 0; i < 2; i++){
+//        d.traverse(player_x,player_y);
+//        d.visited_points.clear();
+//
+//    }
+
+    //Copy the grid from the dfs into the world grid.
+    for(int i = 0; i < grid_height * 2; i++){
+        for (int j = 0; j < grid_width * 2; j++){
+            wall_loc[i][j] = d.grid[i][j];
         }
     }
+    printf("I have visited this many points: %zu", d.visited_points.size());
+
+
     //Add player position
     wall_loc[player_x][player_y] = 2;
     printf("Generated border walls\n");

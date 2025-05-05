@@ -30,7 +30,9 @@ link_directories(${CMAKE_SOURCE_DIR}/common)
 #Main
 set(SOURCE_FILES ${PROJECT_NAME}.cpp)
 set(COMMON_FILES ${CMAKE_SOURCE_DIR}/common/utils.cpp ${CMAKE_SOURCE_DIR}/common/objloader.cpp
-        lighting.h)
+        lighting.h
+        depth_first_search.cpp
+        depth_first_search.h)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${COMMON_FILES})
 
 if(APPLE)
