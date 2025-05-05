@@ -31,8 +31,11 @@ link_directories(${CMAKE_SOURCE_DIR}/common)
 set(SOURCE_FILES ${PROJECT_NAME}.cpp)
 set(COMMON_FILES ${CMAKE_SOURCE_DIR}/common/utils.cpp ${CMAKE_SOURCE_DIR}/common/objloader.cpp
         lighting.h
-        depth_first_search.cpp
-        depth_first_search.h)
+        maze_generators/depth_first_search.cpp
+        maze_generators/depth_first_search.h
+        maze_generators/maze.h
+        maze_generators/maze_prims_algorithm.h
+        maze_generators/maze_prims_algorithm.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${COMMON_FILES})
 
 if(APPLE)

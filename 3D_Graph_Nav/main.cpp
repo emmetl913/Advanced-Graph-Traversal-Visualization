@@ -4,7 +4,8 @@
 #include "../common/objloader.h"
 #include "../common/utils.h"
 #include "../common/vmath.h"
-#include "depth_first_search.h"
+#include "maze_generators/depth_first_search.h"
+#include "maze_generators/maze_prims_algorithm.h"
 #include "lighting.h"
 #include "deque"
 #include <chrono>
@@ -390,24 +391,21 @@ void setup_walls()
      * algorithm will go once that is figured out.
      * For now, walls will be generated at random
      */
-    //Unfinished maze algorithm DFS
-    depth_first_search d = depth_first_search(player_x,player_y,grid_width,grid_height);
-    d.traverse(player_x,player_y,0);
-//    for (int i = 0; i < 2; i++){
-//        d.traverse(player_x,player_y);
-//        d.visited_points.clear();
-//
-//    }
 
-    //Copy the grid from the dfs into the world grid.
-    for(int i = 0; i < grid_height * 2; i++){
-        for (int j = 0; j < grid_width * 2; j++){
-            wall_loc[i][j] = d.grid[i][j];
+    for (int i = -grid_height; i <= grid_height; ++i) {
+        for (int j = -grid_width; j <= grid_width; ++j) {
+            if (i == -grid_height || i == grid_height-1 || j == -grid_width || j == grid_width-1) {
+                wall_loc[i+grid_height][j+grid_width] = 1;
+            }
         }
     }
-    printf("I have visited this many points: %zu", d.visited_points.size());
-
-
+    //PrimsMaze pm = PrimsMaze(player_x, player_y, grid_width, grid_height);
+//    //Copy the grid from the dfs into the world grid.
+//    for(int i = 0; i < grid_height * 2; i++){
+//        for (int j = 0; j < grid_width * 2; j++){
+//            wall_loc[i][j] = pm.grid[i][j];
+//        }
+//    }
     //Add player position
     wall_loc[player_x][player_y] = 2;
     printf("Generated border walls\n");
