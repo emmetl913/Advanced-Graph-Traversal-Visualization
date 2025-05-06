@@ -50,10 +50,6 @@ const char * cubeFile = "../models/unitcube.obj";
 const char * sphereFile = "../models/sphere.obj";
 const char * torusFile = "../models/torus.obj";
 
-// Camera
-vec3 eye = {4.0f, 4.0f, 4.0f};
-vec3 center = {0.0f, 0.0f, 0.0f};
-vec3 up = {0.0f, 1.0f, 0.0f};
 
 // Shader variables
 // Light shader program with shadows reference
@@ -112,10 +108,10 @@ GLuint numLights = 0;
 GLint lightOn[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // Spherical camera state
-GLfloat azimuth = 180.0f;
-GLfloat daz = 2.0f;
-GLfloat elevation = 1.0f;
-GLfloat del = 2.0f;
+GLfloat azimuth = -180.0f;
+GLfloat daz = 8.0f;
+GLfloat elevation = 88.0f;
+GLfloat del = 4.0f;
 GLfloat radius = 12.0f;
 GLfloat dr = 0.1f;
 GLfloat min_radius = 2.0f;
@@ -132,12 +128,11 @@ vec3 axis = {0.0f, 1.0f, 0.0f};
 // Global screen dimensions
 GLint ww,hh;
 
-const int grid_height = 7;
-const int grid_width = 7;
+const int grid_size = 14;
 int player_x = 1;
 int player_y = 1;
 // Cube Position
-vec3 cube_pos = {-grid_height + 1, 0.5f,-grid_width + 1};
+vec3 cube_pos = {1, 0.5f, 1};
 //Used to iterate over the movement history generated from an algorithm.
 //Deque allows us to add to back and pop from front in O(1)
 std::deque<std::pair<int, int>> movement_history;
@@ -150,12 +145,23 @@ bool is_replay_active = false;
 // 2 in the array represents the player
 // 3 in the array represents the goal
 // good luck and god bless - yes let us bless
-int wall_loc[grid_height*2][grid_width*2] = {0};
+int wall_loc[grid_size][grid_size] = {0};
+
+
+// Camera
+vec3 eye = {grid_size / 2.0f, 4.0f, grid_size / 2.0f};
+vec3 center = vec3(grid_size / 2.0f, 0.0f, grid_size / 2.0f);
+vec3 up = {0.0f, 11.0f, .0f};
+
+
+bool algo_or_file_flag = false;
+const char * mazeFile = "../models/maze.txt";
 
 void display( );
 void render_scene( );
 void print_wall_array( );
-void setup_walls( );
+void setup_walls(bool flag);
+void generate_walls_from_file();
 void create_shadows( );
 void build_geometry( );
 void build_materials( );
@@ -198,7 +204,7 @@ int main(int argc, char**argv)
     // Create shadow buffer
     build_shadows();
     // Build walls
-    setup_walls();
+    setup_walls(algo_or_file_flag);
 
     // Load shaders
     // Load light shader with shadows
@@ -321,101 +327,83 @@ void render_scene() {
     mat4 rot_matrix = mat4().identity();
     mat4 trans_matrix = mat4().identity();
 
-
-    rot_matrix = rotate(180.0f, vec3(1.0f, 0.0f, 0.0f));
-    bool isWall = false;
-    for (int i = -grid_height; i < grid_height; ++i) {
-        for (int j = -grid_width; j < grid_width; ++j) {
+    for (int i = 0; i < grid_size; ++i) {
+        for (int j = 0; j < grid_size; ++j) {
+            // Translate to the correct position
             trans_matrix = translate((float)i, -0.1f, (float)j);
-            if(wall_loc[i+grid_height][j+grid_width] == 1)
-            {
+
+            // Determine the type of block and set scale and material
+            if (wall_loc[i][j] == 1) { // Wall
                 scale_matrix = scale(0.9f, 2.0f, 0.9f);
-                isWall = true;
-            } else
-            {
-                scale_matrix = scale(0.9f, 0.2f, 0.9f);
-                isWall = false;
-            }
-            model_matrix = trans_matrix * scale_matrix * rot_matrix;
-            if (!shadow) {
-                normal_matrix = model_matrix.inverse().transpose();
-            }
-            if (isWall)
+                model_matrix = trans_matrix * scale_matrix * rot_matrix;
+                if (!shadow) {
+                    normal_matrix = model_matrix.inverse().transpose();
+                }
                 draw_mat_shadow_object(Cube, Brass);
-            else
+            } else if (wall_loc[i][j] == 2) { // Player
+                scale_matrix = scale(1.0f, 1.0f, 1.0f);
+                model_matrix = trans_matrix * scale_matrix * rot_matrix;
+                if (!shadow) {
+                    normal_matrix = model_matrix.inverse().transpose();
+                }
                 draw_mat_shadow_object(Cube, RedPlastic);
+            } else if (wall_loc[i][j] == 3) { // Goal
+                scale_matrix = scale(0.9f, 0.9f, 0.9f);
+                model_matrix = trans_matrix * scale_matrix * rot_matrix;
+                if (!shadow) {
+                    normal_matrix = model_matrix.inverse().transpose();
+                }
+                draw_mat_shadow_object(Cube, Sphere); // Example: Use a sphere for the goal
+            } else { // Empty space
+                scale_matrix = scale(0.9f, 0.2f, 0.9f);
+                model_matrix = trans_matrix * scale_matrix * rot_matrix;
+                if (!shadow) {
+                    normal_matrix = model_matrix.inverse().transpose();
+                }
+                draw_mat_shadow_object(Cube, RedPlastic); // Example: Use a different material for empty spaces
+            }
         }
     }
-
-    // Set Player transformation matrix
-    trans_matrix = translate(cube_pos);
-    rot_matrix = rotate(sphere_angle, vec3(0.0f, 1.0f, 0.0f));
-    scale_matrix = scale(1.0f, 1.0f, 1.0f);
-    model_matrix = rot_matrix*trans_matrix*scale_matrix;
-    if (!shadow) {
-        // Set normal matrix for phong shadow shader
-        normal_matrix = model_matrix.inverse().transpose();
-    }
-    draw_mat_shadow_object(Cube, RedPlastic);
-
-
 
     // Draw sphere for light position (without shadow)
     if (!shadow) {
         trans_matrix = translate(Lights[0].position[0], Lights[0].position[1], Lights[0].position[2]);
         scale_matrix = scale(0.1f, 0.1f, 0.1f);
         model_matrix = trans_matrix * scale_matrix;
-        // Set normal matrix for lighting shader
         normal_matrix = model_matrix.inverse().transpose();
-        // Draw sphere
         draw_mat_shadow_object(Sphere, Brass);
     }
-
 }
+
 void sleep(int milliseconds){
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
-void setup_walls()
+
+void setup_walls(bool flag)
 {
-    // Prepopulate the wall_loc array with no walls
-    for (int i = 0; i < grid_height; ++i) {
-        for (int j = 0; j < grid_width; ++j) {
-            wall_loc[i][j] = 0;
-        }
-    }
-    printf("Prepopulated empty wall_loc array\n");
-    print_wall_array();
 
-    /*
-     * This is the location where the maze creation
-     * algorithm will go once that is figured out.
-     * For now, walls will be generated at random
-     */
-
-    for (int i = -grid_height; i <= grid_height; ++i) {
-        for (int j = -grid_width; j <= grid_width; ++j) {
-            if (i == -grid_height || i == grid_height-1 || j == -grid_width || j == grid_width-1) {
-                wall_loc[i+grid_height][j+grid_width] = 1;
+    if (flag)
+    {
+        PrimsMaze pm = PrimsMaze(player_x, player_y, grid_size, grid_size);
+        //Copy the grid from the dfs into the world grid.
+        for(int i = 0; i < grid_size; i++){
+            for (int j = 0; j < grid_size; j++){
+                wall_loc[i][j] = pm.grid[i][j];
             }
         }
+    } else
+    {
+        generate_walls_from_file();
     }
-    //PrimsMaze pm = PrimsMaze(player_x, player_y, grid_width, grid_height);
-//    //Copy the grid from the dfs into the world grid.
-//    for(int i = 0; i < grid_height * 2; i++){
-//        for (int j = 0; j < grid_width * 2; j++){
-//            wall_loc[i][j] = pm.grid[i][j];
-//        }
-//    }
     //Add player position
-    wall_loc[player_x][player_y] = 2;
-    printf("Generated border walls\n");
-    print_wall_array();
+    // wall_loc[player_x][player_y] = 2;
+    //print_wall_array();
 }
 
 void print_wall_array()
 {
-    for (int i = 0; i < grid_height*2; ++i) {
-        for (int j = 0; j < grid_width*2; ++j) {
+    for (int i = 0; i < grid_size; ++i) {
+        for (int j = 0; j < grid_size; ++j) {
             printf("%d ", wall_loc[i][j]);
         }
         printf("\n");
@@ -423,6 +411,43 @@ void print_wall_array()
     printf("Player position: %d, %d\n", player_x, player_y);
 }
 
+void generate_walls_from_file()
+{
+    // Open the maze file
+    FILE *file = fopen(mazeFile, "r");
+    if (file == NULL) {
+        printf("Error opening maze file.\n");
+        return;
+    }
+
+
+
+    // Read the maze from the file
+    for (int i = 0; i < grid_size; ++i) {
+        for (int j = 0; j < grid_size+2; ++j) {
+            //printf("%d, ", fgetc(file));
+            char ch = fgetc(file);
+            //printf("%d ", ch);
+            if (ch == 49) {
+                wall_loc[i][j] = 1; // Wall
+            } else if (ch == 48) {
+                wall_loc[i][j] = 0; // Empty space
+            } else if (ch == 50) {
+                wall_loc[i][j] = 2; // Player
+                player_x = i;
+                player_y = j;
+            } else if (ch == 51) {
+                wall_loc[i][j] = 3; // Goal
+            }
+        }
+        printf("\n");
+    }
+
+    // Close the file
+    fclose(file);
+    printf("Generated walls from file\n");
+    print_wall_array();
+}
 
 void create_shadows(){
     // TODO: Set shadow projection matrix
@@ -655,21 +680,22 @@ void draw_mat_shadow_object(GLuint obj, GLuint material){
 //Use this function to check for walls
 bool can_move(int x, int y){
     //Only allow the player to move into a space with the value 0
-    if (wall_loc[x][y] == 0)
+    if (wall_loc[y][x] == 0)
         return true;
     return false;
 }
+
 void move_player(int x, int y){
     if (can_move(x,y)){
-        wall_loc[x][y] = 2; //Set new position to have player in it.
-        wall_loc[player_x][player_y] = 0; // Update previous position to be empty
+        wall_loc[y][x] = 2; //Set new position to have player in it.
+        wall_loc[player_y][player_x] = 0; // Update previous position to be empty
         //Move the player's cube based on whether the x and y are new values
         if (player_x != x){
-            cube_pos[0] += float(x) - float(player_x);
+            cube_pos[0] -= float(x) - float(player_x);
             player_x = x;
         }
         if (player_y != y){
-            cube_pos[2] += float(y) - float(player_y);
+            cube_pos[2] -= float(y) - float(player_y);
             player_y = y;
         }
     }
@@ -678,11 +704,12 @@ void move_player(int x, int y){
     }
 
 }
+
 void generate_spiral_movement() {
     int top = 0;
-    int bottom = grid_height * 2 - 2;
+    int bottom = grid_size - 2;
     int left = 0;
-    int right = grid_width * 2 - 2;
+    int right = grid_size - 2;
 
     while (top <= bottom && left <= right) {
         // Traverse from left to right along the top row
@@ -714,6 +741,7 @@ void generate_spiral_movement() {
         }
     }
 }
+
 void replay_movement_thread(std::deque<std::pair<int, int>> q) {
     {
         std::lock_guard<std::mutex> lock(replay_mutex);
@@ -743,6 +771,7 @@ void start_replay() {
         replay_thread.detach(); // Detach the thread to let it run independently
     }
 }
+
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     // ESC closes window
     if (key == GLFW_KEY_ESCAPE) {
@@ -753,7 +782,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         anim = !anim;
     }
 
-    // Adjust azimuth
+    // Adjust azimuth (horizontal rotation)
     if (key == GLFW_KEY_A) {
         azimuth += daz;
         if (azimuth > 360.0) {
@@ -761,73 +790,64 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     } else if (key == GLFW_KEY_D) {
         azimuth -= daz;
-        if (azimuth < 0.0)
-        {
+        if (azimuth < 0.0) {
             azimuth += 360.0;
         }
     }
 
-    // Adjust elevation angle
-    if (key == GLFW_KEY_W)
-    {
+    // Adjust elevation (vertical rotation)
+    if (key == GLFW_KEY_W) {
         elevation += del;
-        if (elevation > 180.0)
-        {
-            elevation = 179.0;
+        if (elevation > 89.0) { // Limit elevation to avoid flipping
+            elevation = 89.0;
         }
-    }
-    else if (key == GLFW_KEY_S)
-    {
+    } else if (key == GLFW_KEY_S) {
         elevation -= del;
-        if (elevation < 0.0)
-        {
-            elevation = 1.0;
+        if (elevation < -89.0) {
+            elevation = -89.0;
         }
     }
 
     // Adjust radius (zoom)
-    if (key == GLFW_KEY_X)
-    {
+    if (key == GLFW_KEY_X) {
         radius += dr;
-    }
-    else if (key == GLFW_KEY_Z)
-    {
+    } else if (key == GLFW_KEY_Z) {
         radius -= dr;
-        if (radius < min_radius)
-        {
+        if (radius < min_radius) {
             radius = min_radius;
         }
     }
 
-    if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)){
+    // Recalculate eye position based on spherical coordinates
+    GLfloat x = center[0] + radius * sin(azimuth * DEG2RAD) * cos(elevation * DEG2RAD);
+    GLfloat y = center[1] + radius * sin(elevation * DEG2RAD);
+    GLfloat z = center[2] + radius * cos(azimuth * DEG2RAD) * cos(elevation * DEG2RAD);
+    eye = vec3(x, y, z);
+
+    // Player movement
+    if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         move_player(player_x - 1, player_y);
-    } else if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)){
+    } else if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         move_player(player_x + 1, player_y);
-    } else if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)){
-        move_player(player_x, player_y + 1);
-    } else if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)){
+    } else if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         move_player(player_x, player_y - 1);
+    } else if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        move_player(player_x, player_y + 1);
     }
+
     print_wall_array();
-    // Compute updated camera position
-    GLfloat x, y, z;
-    x = (GLfloat)(radius*sin(azimuth*DEG2RAD)*sin(elevation*DEG2RAD));
-    y = (GLfloat)(radius*cos(elevation*DEG2RAD));
-    z = (GLfloat)(radius*cos(azimuth*DEG2RAD)*sin(elevation*DEG2RAD));
-    eye = vec3(x,y,z);
 
     // Toggle spotlight
     if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-        lightOn[WhiteSpotLight] = (lightOn[WhiteSpotLight]+1)%2;
+        lightOn[WhiteSpotLight] = (lightOn[WhiteSpotLight] + 1) % 2;
     }
 
-    if (key == GLFW_KEY_P && action == GLFW_PRESS){
+    // Start replay movement
+    if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         generate_spiral_movement();
         start_replay();
     }
 }
-
-
 
 void mouse_callback(GLFWwindow *window, int button, int action, int mods){
 
