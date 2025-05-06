@@ -35,7 +35,10 @@ set(COMMON_FILES ${CMAKE_SOURCE_DIR}/common/utils.cpp ${CMAKE_SOURCE_DIR}/common
         maze_generators/depth_first_search.h
         maze_generators/maze.h
         maze_generators/maze_prims_algorithm.h
-        maze_generators/maze_prims_algorithm.cpp)
+        maze_generators/maze_prims_algorithm.cpp
+        Pathfinding/A_Start.cpp
+        Pathfinding/A_Star.h
+)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${COMMON_FILES})
 
 if(APPLE)

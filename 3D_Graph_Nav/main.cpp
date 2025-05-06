@@ -11,6 +11,7 @@
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include "Pathfinding/A_Star.h"
 
 
 
@@ -25,7 +26,7 @@ enum ObjBuffer_IDs {PosBuffer, NormBuffer, TexBuffer, NumObjBuffers};
 enum LightBuffer_IDs {LightBuffer, NumLightBuffers};
 enum LightNames {WhiteSpotLight};
 enum MaterialBuffer_IDs {MaterialBuffer, NumMaterialBuffers};
-enum MaterialNames {Brass, RedPlastic};
+enum MaterialNames {Brass, RedPlastic, BluePlastic, GreenPlastic};
 enum Textures {ShadowTex, NumTextures};
 
 // Vertex array and buffer objects
@@ -108,9 +109,9 @@ GLuint numLights = 0;
 GLint lightOn[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 // Spherical camera state
-GLfloat azimuth = -180.0f;
+GLfloat azimuth = -270.0f;
 GLfloat daz = 8.0f;
-GLfloat elevation = 88.0f;
+GLfloat elevation = 45.0f;
 GLfloat del = 4.0f;
 GLfloat radius = 12.0f;
 GLfloat dr = 0.1f;
@@ -159,6 +160,8 @@ const char * mazeFile = "../models/maze.txt";
 
 void display( );
 void render_scene( );
+void find_num( );
+void solve_the_maze( );
 void print_wall_array( );
 void setup_walls(bool flag);
 void generate_walls_from_file();
@@ -346,14 +349,14 @@ void render_scene() {
                 if (!shadow) {
                     normal_matrix = model_matrix.inverse().transpose();
                 }
-                draw_mat_shadow_object(Cube, RedPlastic);
+                draw_mat_shadow_object(Cube, BluePlastic);
             } else if (wall_loc[i][j] == 3) { // Goal
                 scale_matrix = scale(0.9f, 0.9f, 0.9f);
                 model_matrix = trans_matrix * scale_matrix * rot_matrix;
                 if (!shadow) {
                     normal_matrix = model_matrix.inverse().transpose();
                 }
-                draw_mat_shadow_object(Cube, Sphere); // Example: Use a sphere for the goal
+                draw_mat_shadow_object(Cube, GreenPlastic); // Example: Use a sphere for the goal
             } else { // Empty space
                 scale_matrix = scale(0.9f, 0.2f, 0.9f);
                 model_matrix = trans_matrix * scale_matrix * rot_matrix;
@@ -398,6 +401,30 @@ void setup_walls(bool flag)
     //Add player position
     // wall_loc[player_x][player_y] = 2;
     //print_wall_array();
+}
+
+pair<int,int> find_num(int number)
+{
+    for (int i = 0; i < grid_size; ++i)
+    {
+        for (int j = 0; j < grid_size; ++j)
+        {
+            if (wall_loc[i][j] == number)
+            {
+                pair<int, int> p = { i, j };
+                return p;
+            }
+        }
+    }
+    return { -1, -1 };
+}
+
+void solve_the_maze( )
+{
+    pair<int, int> src = find_num(2);
+    pair<int, int> dst = find_num(3);
+
+    //aStarSearch(wall_loc, src, dst);
 }
 
 void print_wall_array()
@@ -504,9 +531,27 @@ void build_materials( ) {
             {0.0f, 0.0f, 0.0f}  //pad
     };
 
+    MaterialProperties bluePlastic ={
+        vec4(0.0f, 0.0f, 0.3f, 1.0f), //ambient
+        vec4(0.0f,0.0f, 0.6f, 1.0f), //diffuse
+        vec4(0.6f, 0.6f, 0.8f, 1.0f), //specular
+        32.0f, //shininess
+        {0.0f, 0.0f, 0.0f}  //pad
+    };
+
+    MaterialProperties greenPlastic = {
+        vec4(0.0f, 0.3f, 0.0f, 1.0f), //ambient
+        vec4(0.0f,0.6f, 0.0f, 1.0f), //diffuse
+        vec4(0.6f, 0.8f, 0.6f, 1.0f), //specular
+        32.0f, //shininess
+        {0.0f, 0.0f, 0.0f}  //pad
+    };
+
     // Add materials to Materials vector
     Materials.push_back(brass);
     Materials.push_back(redPlastic);
+    Materials.push_back(bluePlastic);
+    Materials.push_back(greenPlastic);
 
     // Create uniform buffer for materials
     glGenBuffers(NumMaterialBuffers, MaterialBuffers);
@@ -680,7 +725,7 @@ void draw_mat_shadow_object(GLuint obj, GLuint material){
 //Use this function to check for walls
 bool can_move(int x, int y){
     //Only allow the player to move into a space with the value 0
-    if (wall_loc[y][x] == 0)
+    if (wall_loc[y][x] == 0 || wall_loc[y][x] == 3)
         return true;
     return false;
 }
