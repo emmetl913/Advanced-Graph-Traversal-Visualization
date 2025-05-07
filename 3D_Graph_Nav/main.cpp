@@ -130,7 +130,7 @@ vec3 axis = {0.0f, 1.0f, 0.0f};
 // Global screen dimensions
 GLint ww,hh;
 
-const int grid_size = 17;
+const int grid_size = 14;
 int player_x = 1;
 int player_y = 1;
 // Cube Position
@@ -948,7 +948,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     // Start replay movement
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         //generate_spiral_movement();
-        start_replay();
+        start_replay(0);
     }
 }
 
