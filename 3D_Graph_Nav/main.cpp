@@ -209,6 +209,8 @@ int main(int argc, char**argv)
     // Build walls
     setup_walls(algo_or_file_flag);
 
+    
+
     // Load shaders
     // Load light shader with shadows
 	ShaderInfo phong_shadow_shaders[] = { {GL_VERTEX_SHADER, phong_shadow_vertex_shader},{GL_FRAGMENT_SHADER, phong_shadow_frag_shader},{GL_NONE, NULL} };
@@ -424,7 +426,9 @@ void solve_the_maze( )
     pair<int, int> src = find_num(2);
     pair<int, int> dst = find_num(3);
 
-    //aStarSearch(wall_loc, src, dst);
+    printf("src: %d, %d\n", src.first, src.second);
+
+    aStarSearch(wall_loc, src, dst);
 }
 
 void print_wall_array()
@@ -451,7 +455,7 @@ void generate_walls_from_file()
 
     // Read the maze from the file
     for (int i = 0; i < grid_size; ++i) {
-        for (int j = 0; j < grid_size+2; ++j) {
+        for (int j = 0; j < grid_size; ++j) {
             //printf("%d, ", fgetc(file));
             char ch = fgetc(file);
             //printf("%d ", ch);
@@ -840,6 +844,10 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 
+    if (key == GLFW_KEY_M)
+    {
+        solve_the_maze();
+    }
     // Adjust elevation (vertical rotation)
     if (key == GLFW_KEY_W) {
         elevation += del;

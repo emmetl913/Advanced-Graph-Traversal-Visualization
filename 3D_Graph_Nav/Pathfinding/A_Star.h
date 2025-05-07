@@ -40,7 +40,7 @@ bool isValid(int row, int col)
 
 bool isUnBlocked(int grid[SIZE][SIZE], int row, int col)
 {
-    return (grid[row][col] == 0);
+    return (grid[row][col] != 1);
 }
 
 bool isDestination(int row, int col, Pair dest)
@@ -83,6 +83,7 @@ void tracePath(cell cellDetails[][SIZE], Pair dest)
 
     return;
 }
+
 
 void aStarSearch(int grid[][SIZE], Pair src, Pair dest)
 {
@@ -160,6 +161,8 @@ void aStarSearch(int grid[][SIZE], Pair src, Pair dest)
     // We set this boolean value as false as initially
     // the destination is not reached.
     bool foundDest = false;
+
+    printf("Begin searching...\n");
 
     while (!openList.empty())
     {
