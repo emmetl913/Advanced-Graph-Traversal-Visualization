@@ -129,7 +129,7 @@ vec3 axis = {0.0f, 1.0f, 0.0f};
 // Global screen dimensions
 GLint ww,hh;
 
-const int grid_size = 14;
+const int grid_size = 17;
 int player_x = 1;
 int player_y = 1;
 // Cube Position
@@ -156,7 +156,7 @@ vec3 center = vec3(grid_size / 2.0f, 0.0f, grid_size / 2.0f);
 vec3 up = {0.0f, 11.0f, .0f};
 
 
-bool algo_or_file_flag = false;
+bool algo_or_file_flag = true;
 const char * mazeFile = "../models/maze.txt";
 
 void display( );
@@ -335,7 +335,7 @@ void render_scene() {
         const pair<pair<int, int>,int> p = maze_generation_history.front();
         maze_generation_history.pop_front();
         wall_loc[p.first.first][p.first.second] = p.second;
-        sleep(1);
+        sleep(0);
     }
     for (int i = 0; i < grid_size; ++i) {
         for (int j = 0; j < grid_size; ++j) {
@@ -385,21 +385,21 @@ void render_scene() {
     }
 }
 
-
-
 void setup_walls(bool flag)
 {
 
     if (flag)
     {
         PrimsMaze pm = PrimsMaze(player_x, player_y, grid_size, grid_size);
-        //Copy the grid from the dfs into the world grid.
+        //copy the pm.grid into our grid
+        // maze_generation_history = pm.maze_generation_history;
         for(int i = 0; i < grid_size; i++){
             for (int j = 0; j < grid_size; j++){
                 wall_loc[i][j] = pm.grid[i][j];
             }
         }
-    } else
+    }
+    else
     {
         generate_walls_from_file();
     }
@@ -424,7 +424,7 @@ pair<int,int> find_num(int number)
     return { -1, -1 };
 }
 
-void solve_the_maze( )
+void solve_the_maze()
 {
     pair<int, int> src = find_num(2);
     pair<int, int> dst = find_num(3);

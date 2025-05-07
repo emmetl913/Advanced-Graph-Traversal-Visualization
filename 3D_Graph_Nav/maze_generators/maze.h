@@ -30,14 +30,14 @@ public:
             grid[i] = new int[graphWidth * 2]();
         }
     }
-    //Fill grid with single value
-    void set_grid(int value) const{
-        for (int i = 0; i < graphHeight*2; ++i) {
-            for (int j = 0; j < graphWidth*2; ++j) {
-                grid[i][j] = value;
-            }
-        }
-    }
+    // //Fill grid with single value
+    // void set_grid(int value) const{
+    //     for (int i = 0; i < graphHeight*2; ++i) {
+    //         for (int j = 0; j < graphWidth*2; ++j) {
+    //             grid[i][j] = value;
+    //         }
+    //     }
+    // }
     virtual void generate_maze() = 0; //Override in children class to solve for maze
 
     //Later we will figure out if we want to redraw wall placement in this class or do elsewhere
