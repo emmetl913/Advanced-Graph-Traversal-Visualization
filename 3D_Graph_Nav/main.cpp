@@ -51,6 +51,7 @@ const char * cubeFile = "../models/unitcube.obj";
 const char * sphereFile = "../models/sphere.obj";
 const char * torusFile = "../models/torus.obj";
 
+typedef pair<int, int> Pair;
 
 // Shader variables
 // Light shader program with shadows reference
@@ -151,8 +152,8 @@ int wall_loc[grid_size][grid_size] = {0};
 
 
 // Camera
-vec3 eye = {grid_size / 2.0f, 4.0f, grid_size / 2.0f};
-vec3 center = vec3(grid_size / 2.0f, 0.0f, grid_size / 2.0f);
+vec3 eye = {grid_size / 2.0f, 4.0f, -grid_size / 2.0f};
+vec3 center = vec3(grid_size / 2.0f, 0.0f, -grid_size / 2.0f);
 vec3 up = {0.0f, 11.0f, .0f};
 
 
@@ -207,6 +208,8 @@ int main(int argc, char**argv)
     build_lights();
     // Create shadow buffer
     build_shadows();
+
+    
 
     // Load shaders
     // Load light shader with shadows
@@ -340,7 +343,7 @@ void render_scene() {
     for (int i = 0; i < grid_size; ++i) {
         for (int j = 0; j < grid_size; ++j) {
             // Translate to the correct position
-            trans_matrix = translate((float)i, -0.1f, (float)j);
+            trans_matrix = translate((float)i, -0.1f, (float)-j);
 
             // Determine the type of block and set scale and material
             if (wall_loc[i][j] == 1) { // Wall
@@ -429,7 +432,26 @@ void solve_the_maze()
     pair<int, int> src = find_num(2);
     pair<int, int> dst = find_num(3);
 
-    //aStarSearch(wall_loc, src, dst);
+    printf("src: %d, %d\n", src.first, src.second);
+
+    stack<Pair> path = aStarSearch(wall_loc, src, dst);
+
+    movement_history.clear();
+
+    // Print the path
+    if (path.empty()) {;
+        printf("\nNo path found\n");
+        return;
+    }
+
+    while (!path.empty()) {
+        pair<int,int> p = path.top();
+        path.pop();
+        printf("Queueing: %d, %d\n", p.first, p.second);
+        movement_history.emplace_back(p);
+
+    }
+    printf("Movement History: %zu", movement_history.size());
 }
 
 void print_wall_array()
@@ -819,8 +841,8 @@ void replay_movement_thread(std::deque<std::pair<int, int>> q) {
     while (!q.empty()) {
         std::pair<int, int> p = q.front();
         q.pop_front();
-        move_player(p.first, p.second);
-        sleep(25);
+        move_player(p.second, p.first);
+        sleep(200);
     }
 
     {
@@ -867,6 +889,10 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 
+    if (key == GLFW_KEY_M)
+    {
+        solve_the_maze();
+    }
     // Adjust elevation (vertical rotation)
     if (key == GLFW_KEY_W) {
         elevation += del;
@@ -921,8 +947,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
     // Start replay movement
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-        generate_spiral_movement();
-        start_replay(0);
+        //generate_spiral_movement();
+        start_replay();
     }
 }
 
