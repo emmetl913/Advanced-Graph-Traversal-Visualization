@@ -136,6 +136,7 @@ vec3 cube_pos = {1, 0.5f, 1};
 //Used to iterate over the movement history generated from an algorithm.
 //Deque allows us to add to back and pop from front in O(1)
 std::deque<std::pair<int, int>> movement_history;
+std::deque<pair<pair<int,int>, int>> maze_generation_history;
 std::mutex replay_mutex;
 bool is_replay_active = false;
 
@@ -203,8 +204,6 @@ int main(int argc, char**argv)
     build_lights();
     // Create shadow buffer
     build_shadows();
-    // Build walls
-    setup_walls(algo_or_file_flag);
 
     // Load shaders
     // Load light shader with shadows
@@ -320,13 +319,21 @@ void display( )
 
     glFlush();
 }
-
+void sleep(int milliseconds){
+    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
 void render_scene() {
     model_matrix = mat4().identity();
     mat4 scale_matrix = mat4().identity();
     mat4 rot_matrix = mat4().identity();
     mat4 trans_matrix = mat4().identity();
-
+    if (!maze_generation_history.empty()) {
+        printf("queue size %zi", maze_generation_history.size());
+        const pair<pair<int, int>,int> p = maze_generation_history.front();
+        maze_generation_history.pop_front();
+        wall_loc[p.first.first][p.first.second] = p.second;
+        sleep(1);
+    }
     for (int i = 0; i < grid_size; ++i) {
         for (int j = 0; j < grid_size; ++j) {
             // Translate to the correct position
@@ -375,9 +382,7 @@ void render_scene() {
     }
 }
 
-void sleep(int milliseconds){
-    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
-}
+
 
 void setup_walls(bool flag)
 {
@@ -429,15 +434,22 @@ void generate_walls_from_file()
             char ch = fgetc(file);
             //printf("%d ", ch);
             if (ch == 49) {
-                wall_loc[i][j] = 1; // Wall
+                maze_generation_history.emplace_back(make_pair(make_pair(i,j),1));
+                //wall_loc[i][j] = 1; // Wall
             } else if (ch == 48) {
-                wall_loc[i][j] = 0; // Empty space
+                maze_generation_history.emplace_back(make_pair(make_pair(i,j),0));
+
+                // wall_loc[i][j] = 0; // Empty space
             } else if (ch == 50) {
-                wall_loc[i][j] = 2; // Player
+                maze_generation_history.emplace_back(make_pair(make_pair(i,j),2));
+
+                // wall_loc[i][j] = 2; // Player
                 player_x = i;
                 player_y = j;
             } else if (ch == 51) {
-                wall_loc[i][j] = 3; // Goal
+                maze_generation_history.emplace_back(make_pair(make_pair(i,j),3));
+
+                // wall_loc[i][j] = 3; // Goal
             }
         }
         printf("\n");
@@ -764,11 +776,18 @@ void replay_movement_thread(std::deque<std::pair<int, int>> q) {
     }
 }
 
-void start_replay() {
+//i = 0: Replay movement, i = 1: Replay Maze Generation
+void start_replay(int i) {
     std::lock_guard<std::mutex> lock(replay_mutex);
     if (!is_replay_active) {
-        std::thread replay_thread(replay_movement_thread, movement_history);
-        replay_thread.detach(); // Detach the thread to let it run independently
+        if (i == 0) {
+            std::thread replay_thread(replay_movement_thread, movement_history);
+            replay_thread.detach(); // Detach the thread to let it run independently
+        }
+        // if (i == 1) {
+        //     std::thread replay_thread(replay_maze_generation_thread, maze_generation_history);
+        //     replay_thread.detach(); // Detach the thread to let it run independently
+        // }
     }
 }
 
@@ -818,6 +837,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 
+    if (key == GLFW_KEY_SPACE) {
+        // Build walls
+        setup_walls(algo_or_file_flag);
+    }
+
     // Recalculate eye position based on spherical coordinates
     GLfloat x = center[0] + radius * sin(azimuth * DEG2RAD) * cos(elevation * DEG2RAD);
     GLfloat y = center[1] + radius * sin(elevation * DEG2RAD);
@@ -845,7 +869,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     // Start replay movement
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         generate_spiral_movement();
-        start_replay();
+        start_replay(0);
     }
 }
 
