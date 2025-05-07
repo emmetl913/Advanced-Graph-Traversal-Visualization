@@ -328,7 +328,7 @@ void render_scene() {
     mat4 rot_matrix = mat4().identity();
     mat4 trans_matrix = mat4().identity();
     if (!maze_generation_history.empty()) {
-        printf("queue size %zi", maze_generation_history.size());
+        //printf("queue size %zi", maze_generation_history.size());
         const pair<pair<int, int>,int> p = maze_generation_history.front();
         maze_generation_history.pop_front();
         wall_loc[p.first.first][p.first.second] = p.second;
@@ -428,32 +428,40 @@ void generate_walls_from_file()
 
 
     // Read the maze from the file
+    int count = 0;
+    maze_generation_history.clear();
     for (int i = 0; i < grid_size; ++i) {
-        for (int j = 0; j < grid_size+2; ++j) {
+        for (int j = 0; j < grid_size; ++j) {
             //printf("%d, ", fgetc(file));
             char ch = fgetc(file);
             //printf("%d ", ch);
             if (ch == 49) {
-                maze_generation_history.emplace_back(make_pair(make_pair(i,j),1));
+                maze_generation_history.emplace_back(make_pair(i,j),1);
                 //wall_loc[i][j] = 1; // Wall
+                count++;
+
             } else if (ch == 48) {
-                maze_generation_history.emplace_back(make_pair(make_pair(i,j),0));
+                maze_generation_history.emplace_back(make_pair(i,j),0);
+                count++;
 
                 // wall_loc[i][j] = 0; // Empty space
             } else if (ch == 50) {
-                maze_generation_history.emplace_back(make_pair(make_pair(i,j),2));
+                maze_generation_history.emplace_back(make_pair(i,j),2);
+                count++;
 
                 // wall_loc[i][j] = 2; // Player
                 player_x = i;
                 player_y = j;
             } else if (ch == 51) {
-                maze_generation_history.emplace_back(make_pair(make_pair(i,j),3));
+                maze_generation_history.emplace_back(make_pair(i,j),3);
+                count++;
 
                 // wall_loc[i][j] = 3; // Goal
             }
         }
         printf("\n");
     }
+    printf("count: %i", count);
 
     // Close the file
     fclose(file);
