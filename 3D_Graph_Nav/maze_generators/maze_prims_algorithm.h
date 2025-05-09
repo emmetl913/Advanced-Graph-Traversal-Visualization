@@ -7,7 +7,7 @@
 #include "maze.h"
 #include <utility>
 #include <set>
-#include "deque"
+#include <queue>
 
 class PrimsMaze : public Maze{
 private:
@@ -42,7 +42,7 @@ public:
             PrimsMaze::generate_maze();
     }
     std::pair<int,int> player_start, goal;
-    std::deque<std::pair<std::pair<int,int>, int>> maze_generation_history;
+    std::queue<std::pair<std::pair<int,int>, int>> maze_generation_history;
 
 };
 #endif //ADVANCED_GRAPH_TRAVERSAL_VISUALIZATION_MAZE_PRIMS_ALGORITHM_H

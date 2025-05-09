@@ -115,7 +115,7 @@ GLfloat daz = 8.0f;
 GLfloat elevation = 45.0f;
 GLfloat del = 4.0f;
 GLfloat radius = 12.0f;
-GLfloat dr = 0.1f;
+GLfloat dr = 10.1f;
 GLfloat min_radius = 2.0f;
 bool anim = true;
 
@@ -333,13 +333,16 @@ void render_scene() {
     mat4 scale_matrix = mat4().identity();
     mat4 rot_matrix = mat4().identity();
     mat4 trans_matrix = mat4().identity();
-    if (!maze_generation_history.empty()) {
-        //printf("queue size %zi", maze_generation_history.size());
-        const pair<pair<int, int>,int> p = maze_generation_history.front();
-        maze_generation_history.pop_front();
-        wall_loc[p.first.first][p.first.second] = p.second;
-        sleep(0);
+    for (int i = 0; i < (int)SIZE*.1; i ++) {
+        if (!maze_generation_history.empty()) {
+            //printf("queue size %zi", maze_generation_history.size());
+            const pair<pair<int, int>,int> p = maze_generation_history.front();
+            maze_generation_history.pop_front();
+            wall_loc[p.first.first][p.first.second] = p.second;
+            //sleep(1);
+        }
     }
+
     for (int i = 0; i < SIZE; ++i) {
         for (int j = 0; j < SIZE; ++j) {
             // Translate to the correct position
@@ -402,13 +405,21 @@ void setup_walls(bool flag)
     if (flag)
     {
         PrimsMaze pm = PrimsMaze(player_x, player_y, SIZE, SIZE);
-        //Copy the grid from the dfs into the world grid.
-        for(int i = 0; i < SIZE; i++){
-            for (int j = 0; j < SIZE; j++){
-                wall_loc[i][j] = pm.grid[i][j];
-            }
+        //set grid to 0s
+         for(int i = 0; i < SIZE; i++){
+             for (int j = 0; j < SIZE; j++){
+                 wall_loc[i][j] = 0;
+             }
+         }
+        maze_generation_history.clear();
+        int m_history_size = pm.maze_generation_history.size();
+        for (int i = 0; i < m_history_size;i++) {
+            std::pair<std::pair<int,int>, int> wall = pm.maze_generation_history.front();
+            pm.maze_generation_history.pop();
+            maze_generation_history.emplace_back(make_pair(wall.first.first, wall.first.second),wall.second);
         }
     }
+
     else
     {
         generate_walls_from_file();

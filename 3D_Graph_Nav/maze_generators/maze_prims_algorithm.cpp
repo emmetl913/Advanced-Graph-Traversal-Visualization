@@ -55,12 +55,12 @@ void PrimsMaze::set_grid(int grid_coloring) {
                     if (i % 2 == 0) {//Even rows go Pillar Wall Pillar
                         if (j % 2 == 0) {
                             grid[i][j] = 1;
+                            maze_generation_history.push(std::make_pair(std::make_pair(i,j), 1));
                            // maze_generation_history.emplace_back(std::make_pair(i,j), 1);
                         }
                         else {
                             grid[i][j] = 1;
-                           // maze_generation_history.emplace_back(std::make_pair(i,j), 1);
-
+                            maze_generation_history.push(std::make_pair(std::make_pair(i,j), 1));
                             //Lets add our walls to our wall list
                             wall_set.emplace(i,j);
 
@@ -69,7 +69,7 @@ void PrimsMaze::set_grid(int grid_coloring) {
                     else {
                         if (j % 2 == 0) { //Odd rows go Wall, Room, Wall
                             grid[i][j] = 1;
-                           // maze_generation_history.emplace_back(std::make_pair(i,j), 1);
+                            maze_generation_history.push(std::make_pair(std::make_pair(i,j), 1));
 
                             //Lets add our walls to our wall list
                             wall_set.emplace(i,j);
@@ -77,7 +77,7 @@ void PrimsMaze::set_grid(int grid_coloring) {
                         }
                         else {
                             grid[i][j] = 0;
-                            //maze_generation_history.emplace_back(std::make_pair(i,j), 0);
+                            maze_generation_history.push(std::make_pair(std::make_pair(i,j), 0));
 
                             //These are rooms. Lets add these to our room set.
                             room_set.emplace(i,j);
@@ -120,6 +120,8 @@ void PrimsMaze::generate_maze() {
     path_set.emplace(current_room.first, current_room.second);
     player_start = current_room;
     grid[current_room.first][current_room.second] = 2;
+    maze_generation_history.push(std::make_pair(std::make_pair(current_room.first,current_room.second), 2));
+
 
     printf("first room: %i, %i\n", firstItem.first, firstItem.second);
     //3) Get the adjacent walls to our first room and add them to the wall list
@@ -149,6 +151,8 @@ void PrimsMaze::generate_maze() {
                 //i) Mark the wall as "Open".
                 //maze_generation_history.emplace_back(std::make_pair(current_wall.first,current_wall.second), 0);
                 grid[current_wall.first][current_wall.second] = 0;
+                maze_generation_history.push(std::make_pair(std::make_pair(current_wall.first,current_wall.second), 0));
+
                 // printf("We broke a wall!\n");
 
                 //ii) Add the unvisited room to the path.
@@ -164,16 +168,19 @@ void PrimsMaze::generate_maze() {
         //d) remove the wall from the wall_list and the wall_set
         wall_set.erase({current_wall.first, current_wall.second});
         wall_list.erase(std::remove(wall_list.begin(), wall_list.end(), std::make_pair(current_wall.first, current_wall.second)), wall_list.end());
+        // wall_list.erase(std::remove(wall_list.begin(), wall_list.end(), std::make_pair(current_wall.first, current_wall.second)), wall_list.end());
     }
     std::pair<int, int> last_room = get_last_item(path_set);
     goal = last_room;
     grid[goal.first][goal.second] = 3;
-    for (int i = 0; i < graphHeight; ++i) {
-        for (int j = 0; j < graphWidth; ++j) {
-            printf("%i ", grid[i][j]);
-        }
-        printf("\n");
-    }
+    maze_generation_history.push(std::make_pair(std::make_pair(goal.first, goal.second), 3));
+
+    // for (int i = 0; i < graphHeight; ++i) {
+    //     for (int j = 0; j < graphWidth; ++j) {
+    //         printf("%i ", grid[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 }
 
 bool PrimsMaze::is_pair_in_set(const std::set<std::pair<int, int>>& my_set, int x, int y) {
