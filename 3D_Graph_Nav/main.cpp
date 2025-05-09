@@ -130,7 +130,6 @@ vec3 axis = {0.0f, 1.0f, 0.0f};
 // Global screen dimensions
 GLint ww,hh;
 
-const int grid_size = 14;
 int player_x = 1;
 int player_y = 1;
 // Cube Position
@@ -147,12 +146,12 @@ bool is_replay_active = false;
 // 2 in the array represents the player
 // 3 in the array represents the goal
 // good luck and god bless - yes let us bless
-int wall_loc[grid_size][grid_size] = {0};
+int wall_loc[SIZE][SIZE] = {0};
 
 
 // Camera
-vec3 eye = {grid_size / 2.0f, 4.0f, -grid_size / 2.0f};
-vec3 center = vec3(grid_size / 2.0f, 0.0f, -grid_size / 2.0f);
+vec3 eye = {SIZE / 2.0f, 4.0f, -SIZE / 2.0f};
+vec3 center = vec3(SIZE / 2.0f, 0.0f, -SIZE / 2.0f);
 vec3 up = {0.0f, 11.0f, .0f};
 
 
@@ -333,8 +332,8 @@ void render_scene() {
     mat4 rot_matrix = mat4().identity();
     mat4 trans_matrix = mat4().identity();
 
-    for (int i = 0; i < grid_size; ++i) {
-        for (int j = 0; j < grid_size; ++j) {
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = 0; j < SIZE; ++j) {
             // Translate to the correct position
             trans_matrix = translate((float)i, -0.1f, (float)-j);
 
@@ -390,10 +389,10 @@ void setup_walls(bool flag)
 
     if (flag)
     {
-        PrimsMaze pm = PrimsMaze(player_x, player_y, grid_size, grid_size);
+        PrimsMaze pm = PrimsMaze(player_x, player_y, SIZE, SIZE);
         //Copy the grid from the dfs into the world grid.
-        for(int i = 0; i < grid_size; i++){
-            for (int j = 0; j < grid_size; j++){
+        for(int i = 0; i < SIZE; i++){
+            for (int j = 0; j < SIZE; j++){
                 wall_loc[i][j] = pm.grid[i][j];
             }
         }
@@ -408,9 +407,9 @@ void setup_walls(bool flag)
 
 pair<int,int> find_num(int number)
 {
-    for (int i = 0; i < grid_size; ++i)
+    for (int i = 0; i < SIZE; ++i)
     {
-        for (int j = 0; j < grid_size; ++j)
+        for (int j = 0; j < SIZE; ++j)
         {
             if (wall_loc[i][j] == number)
             {
@@ -451,8 +450,8 @@ void solve_the_maze( )
 
 void print_wall_array()
 {
-    for (int i = 0; i < grid_size; ++i) {
-        for (int j = 0; j < grid_size; ++j) {
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = 0; j < SIZE; ++j) {
             printf("%d ", wall_loc[i][j]);
         }
         printf("\n");
@@ -472,8 +471,8 @@ void generate_walls_from_file()
 
 
     // Read the maze from the file
-    for (int i = 0; i < grid_size; ++i) {
-        for (int j = 0; j < grid_size; ++j) {
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = 0; j < SIZE; ++j) {
             //printf("%d, ", fgetc(file));
             char ch = fgetc(file);
             //printf("%d ", ch);
@@ -774,9 +773,9 @@ void move_player(int x, int y){
 
 void generate_spiral_movement() {
     int top = 0;
-    int bottom = grid_size - 2;
+    int bottom = SIZE - 2;
     int left = 0;
-    int right = grid_size - 2;
+    int right = SIZE - 2;
 
     while (top <= bottom && left <= right) {
         // Traverse from left to right along the top row
