@@ -5,6 +5,7 @@
 #include <set>
 #include <utility>
 #include <random>
+#include <algorithm>
 
 std::pair<int, int> get_last_item(const std::set<std::pair<int, int>>& path_set) {
     if (!path_set.empty()) {

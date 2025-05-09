@@ -26,7 +26,7 @@ enum ObjBuffer_IDs {PosBuffer, NormBuffer, TexBuffer, NumObjBuffers};
 enum LightBuffer_IDs {LightBuffer, NumLightBuffers};
 enum LightNames {WhiteSpotLight};
 enum MaterialBuffer_IDs {MaterialBuffer, NumMaterialBuffers};
-enum MaterialNames {Brass, RedPlastic, BluePlastic, GreenPlastic};
+enum MaterialNames {Brass, RedPlastic, BluePlastic, GreenPlastic, WhitePlastic};
 enum Textures {ShadowTex, NumTextures};
 
 // Vertex array and buffer objects
@@ -367,7 +367,15 @@ void render_scene() {
                     normal_matrix = model_matrix.inverse().transpose();
                 }
                 draw_mat_shadow_object(Cube, GreenPlastic); // Example: Use a sphere for the goal
-            } else { // Empty space
+            } else if (wall_loc[i][j] == 4)
+            {
+                scale_matrix = scale(0.9f, 0.2f, 0.9f);
+                model_matrix = trans_matrix * scale_matrix * rot_matrix;
+                if (!shadow) {
+                    normal_matrix = model_matrix.inverse().transpose();
+                }
+                draw_mat_shadow_object(Cube, WhitePlastic);
+            }else { // Empty space
                 scale_matrix = scale(0.9f, 0.2f, 0.9f);
                 model_matrix = trans_matrix * scale_matrix * rot_matrix;
                 if (!shadow) {
@@ -505,6 +513,9 @@ void generate_walls_from_file()
 //                count++;
 
                 // wall_loc[i][j] = 3; // Goal
+            } else if (ch == 52)
+            {
+                maze_generation_history.emplace_back(make_pair(i,j),4);
             }
         }
         printf("\n");
@@ -588,11 +599,20 @@ void build_materials( ) {
         {0.0f, 0.0f, 0.0f}  //pad
     };
 
+    MaterialProperties whitePlastic = {
+        vec4(0.9f, 0.9f, 0.9f, 1.0f), // ambient
+        vec4(1.0f, 1.0f, 1.0f, 1.0f), // diffuse
+        vec4(0.8f, 0.8f, 0.8f, 1.0f), // specular
+        32.0f,                        // shininess
+        {0.0f, 0.0f, 0.0f}            // pad
+    };
+
     // Add materials to Materials vector
     Materials.push_back(brass);
     Materials.push_back(redPlastic);
     Materials.push_back(bluePlastic);
     Materials.push_back(greenPlastic);
+    Materials.push_back(whitePlastic);
 
     // Create uniform buffer for materials
     glGenBuffers(NumMaterialBuffers, MaterialBuffers);
@@ -774,7 +794,7 @@ bool can_move(int x, int y){
 void move_player(int x, int y){
     if (can_move(x,y)){
         wall_loc[y][x] = 2; //Set new position to have player in it.
-        wall_loc[player_y][player_x] = 0; // Update previous position to be empty
+        wall_loc[player_y][player_x] = 4; // Update previous position to be empty
         //Move the player's cube based on whether the x and y are new values
         if (player_x != x){
             cube_pos[0] -= float(x) - float(player_x);
