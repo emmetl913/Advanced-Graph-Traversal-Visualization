@@ -39,10 +39,10 @@ private:
 public:
     PrimsMaze(int startX, int startY, int graphWidth, int graphHeight)
             : Maze(startX, startY, graphWidth, graphHeight) {
-        generate_maze();
+            PrimsMaze::generate_maze();
     }
-
-    // std::deque<std::pair<std::pair<int,int>, int>> maze_generation_history;
+    std::pair<int,int> player_start, goal;
+    std::deque<std::pair<std::pair<int,int>, int>> maze_generation_history;
 
 };
 #endif //ADVANCED_GRAPH_TRAVERSAL_VISUALIZATION_MAZE_PRIMS_ALGORITHM_H

@@ -6,6 +6,12 @@
 #include <utility>
 #include <random>
 
+std::pair<int, int> get_last_item(const std::set<std::pair<int, int>>& path_set) {
+    if (!path_set.empty()) {
+        return *std::prev(path_set.end());
+    }
+    return {-1, -1}; // Return a default value if the set is empty
+}
 std::vector<std::pair<int, int>> PrimsMaze::get_adjacent_walls(int x, int y) {
     std::vector<std::pair<int,int>> neighbors;
 
@@ -42,8 +48,8 @@ std::vector<std::pair<int, int>> PrimsMaze::get_adjacent_rooms(int x, int y) {
 }
 //Wall = 1, Pillar = (1 as a wall - 2 as a different color for debug), Room = 3
 void PrimsMaze::set_grid(int grid_coloring) {
-    for (int i = 0; i < graphHeight*2 - 2; ++i) {  // -2 is for the border walls
-            for (int j = 0; j < graphWidth*2 - 2; ++j) { // -2 is for the border walls
+    for (int i = 0; i < graphHeight; ++i) {  // -2 is for the border walls
+            for (int j = 0; j < graphWidth ; ++j) { // -2 is for the border walls
                 if (grid_coloring == 0) {
                     if (i % 2 == 0) {//Even rows go Pillar Wall Pillar
                         if (j % 2 == 0) {
@@ -95,7 +101,7 @@ std::pair<int,int> PrimsMaze::exactly_one_room_not_in_path_adjacent_to_wall(cons
     if (count > 1) {
         room = std::make_pair(-1,-1);
     }
-    printf("Found this many not in path adjacent to wall rooms: %i\n", count);
+    // printf("Found this many not in path adjacent to wall rooms: %i\n", count);
     return room;
 
 }
@@ -111,18 +117,20 @@ void PrimsMaze::generate_maze() {
     auto firstItem = *room_set.begin();
     current_room = firstItem;
     path_set.emplace(current_room.first, current_room.second);
+    player_start = current_room;
+    grid[current_room.first][current_room.second] = 2;
 
     printf("first room: %i, %i\n", firstItem.first, firstItem.second);
     //3) Get the adjacent walls to our first room and add them to the wall list
     std::vector<std::pair<int, int>> adj_walls = get_adjacent_walls(current_room.first, current_room.second);
     for (int i = 0; i < adj_walls.size(); i++) {
         wall_list.emplace_back(adj_walls[i]);
-        printf("added an adj_wall\n");
+        // printf("added an adj_wall\n");
     }
 
     //4) While the wall list is not empty, iterate
     while (!wall_list.empty()) {
-        printf("we made it to the loop!\n");
+        // printf("we made it to the loop!\n");
         //a) Select a wall
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -133,7 +141,7 @@ void PrimsMaze::generate_maze() {
         std::vector<std::pair<int, int>> adj_rooms = get_adjacent_rooms(current_wall.first, current_wall.second);
         //c) if adj_rooms size == 2, and EXACTLY one room is not in the path_set
         if (adj_rooms.size() == 2) {
-            printf("We found adjacent rooms to our wall\n");
+            // printf("We found adjacent rooms to our wall\n");
             //count adj_rooms in the path set and if only one is NOT in the path set, return that room else return (-1,-1)
             std::pair<int, int> exact_room = exactly_one_room_not_in_path_adjacent_to_wall(adj_rooms);
             if (exact_room != std::make_pair(-1,-1)) { //Then we have exactly one adj room not in the path set.
@@ -155,6 +163,15 @@ void PrimsMaze::generate_maze() {
         //d) remove the wall from the wall_list and the wall_set
         wall_set.erase({current_wall.first, current_wall.second});
         wall_list.erase(std::remove(wall_list.begin(), wall_list.end(), std::make_pair(current_wall.first, current_wall.second)), wall_list.end());
+    }
+    std::pair<int, int> last_room = get_last_item(path_set);
+    goal = last_room;
+    grid[goal.first][goal.second] = 3;
+    for (int i = 0; i < graphHeight; ++i) {
+        for (int j = 0; j < graphWidth; ++j) {
+            printf("%i ", grid[i][j]);
+        }
+        printf("\n");
     }
 }
 

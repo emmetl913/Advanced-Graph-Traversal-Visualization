@@ -157,6 +157,7 @@ vec3 up = {0.0f, 11.0f, .0f};
 
 
 bool algo_or_file_flag = true;
+bool debug_print = false;
 const char * mazeFile = "../models/maze.txt";
 
 void display( );
@@ -456,11 +457,13 @@ void print_wall_array()
 {
     for (int i = 0; i < SIZE; ++i) {
         for (int j = 0; j < SIZE; ++j) {
-            printf("%d ", wall_loc[i][j]);
+            if (debug_print)
+                printf("%d ", wall_loc[i][j]);
         }
         printf("\n");
     }
-    printf("Player position: %d, %d\n", player_x, player_y);
+    if (debug_print)
+        printf("Player position: %d, %d\n", player_x, player_y);
 }
 
 void generate_walls_from_file()
@@ -483,30 +486,30 @@ void generate_walls_from_file()
             if (ch == 49) {
                 maze_generation_history.emplace_back(make_pair(i,j),1);
                 //wall_loc[i][j] = 1; // Wall
-                count++;
+//                count++;
 
             } else if (ch == 48) {
                 maze_generation_history.emplace_back(make_pair(i,j),0);
-                count++;
+//                count++;
 
                 // wall_loc[i][j] = 0; // Empty space
             } else if (ch == 50) {
                 maze_generation_history.emplace_back(make_pair(i,j),2);
-                count++;
+//                count++;
 
                 // wall_loc[i][j] = 2; // Player
                 player_x = i;
                 player_y = j;
             } else if (ch == 51) {
                 maze_generation_history.emplace_back(make_pair(i,j),3);
-                count++;
+//                count++;
 
                 // wall_loc[i][j] = 3; // Goal
             }
         }
         printf("\n");
     }
-    printf("count: %i", count);
+   // / printf("count: %i", count);
 
     // Close the file
     fclose(file);

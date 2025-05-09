@@ -17,7 +17,7 @@
 #include <cfloat>
 #include <set>
 
-#define SIZE 14
+#define SIZE 49
 
 using namespace std;
 
