@@ -130,7 +130,7 @@ vec3 axis = {0.0f, 1.0f, 0.0f};
 // Global screen dimensions
 GLint ww,hh;
 
-const int grid_size = 14;
+const int grid_size = 15;
 int player_x = 1;
 int player_y = 1;
 // Cube Position
@@ -916,7 +916,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         }
     }
 
-    if (key == GLFW_KEY_SPACE) {
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
         // Build walls
         setup_walls(algo_or_file_flag);
     }
