@@ -7,12 +7,26 @@
 #include <random>
 #include <algorithm>
 
+/*******************************************************************************
+ *     Method: get_last_item
+ *     Description: Retrieves the last item from a set of pairs. If the set is empty,
+ *                  returns a default value of (-1, -1).
+ *     Parameters: const std::set<std::pair<int, int>>& path_set - The set of pairs to retrieve the last item from.
+ *     Return Value: std::pair<int, int> - The last item in the set or (-1, -1) if the set is empty.
+ ********************************************************************************/
 std::pair<int, int> get_last_item(const std::set<std::pair<int, int>>& path_set) {
     if (!path_set.empty()) {
         return *std::prev(path_set.end());
     }
     return {-1, -1}; // Return a default value if the set is empty
 }
+/*******************************************************************************
+ *     Method: get_adjacent_walls
+ *     Description: Finds all valid adjacent walls to a given cell in the maze.
+ *     Parameters: int x - The x-coordinate of the cell.
+ *                 int y - The y-coordinate of the cell.
+ *     Return Value: std::vector<std::pair<int, int>> - A vector of adjacent wall coordinates.
+ ********************************************************************************/
 std::vector<std::pair<int, int>> PrimsMaze::get_adjacent_walls(int x, int y) {
     std::vector<std::pair<int,int>> neighbors;
 
@@ -33,7 +47,13 @@ std::vector<std::pair<int, int>> PrimsMaze::get_adjacent_walls(int x, int y) {
     return neighbors;
 }
 
-
+/*******************************************************************************
+ *     Method: get_adjacent_rooms
+ *     Description: Finds all valid adjacent rooms to a given cell in the maze.
+ *     Parameters: int x - The x-coordinate of the cell.
+ *                 int y - The y-coordinate of the cell.
+ *     Return Value: std::vector<std::pair<int, int>> - A vector of adjacent room coordinates.
+ ********************************************************************************/
 std::vector<std::pair<int, int>> PrimsMaze::get_adjacent_rooms(int x, int y) {
     std::vector<std::pair<int, int>> rooms;
     //Check left, right, up, and down
@@ -47,6 +67,12 @@ std::vector<std::pair<int, int>> PrimsMaze::get_adjacent_rooms(int x, int y) {
         rooms.emplace_back(x,y-1);
     return rooms;
 }
+/*******************************************************************************
+ *     Method: set_grid
+ *     Description: Initializes the maze grid with walls, pillars, and rooms based on the specified coloring.
+ *     Parameters: int grid_coloring - The coloring scheme for the grid (0 for default).
+ *     Return Value: void
+ ********************************************************************************/
 //Wall = 1, Pillar = (1 as a wall - 2 as a different color for debug), Room = 3
 void PrimsMaze::set_grid(int grid_coloring) {
     for (int i = 0; i < graphHeight; ++i) {  // -2 is for the border walls
@@ -89,6 +115,13 @@ void PrimsMaze::set_grid(int grid_coloring) {
         }
 }
 
+/*******************************************************************************
+ *     Method: exactly_one_room_not_in_path_adjacent_to_wall
+ *     Description: Checks if exactly one room adjacent to a wall is not in the path set.
+ *     Parameters: const std::vector<std::pair<int, int>>& adj_rooms - A vector of adjacent room coordinates.
+ *     Return Value: std::pair<int, int> - The coordinates of the room if exactly one is not in the path set,
+ *                                         otherwise returns (-1, -1).
+ ********************************************************************************/
 //Returns (-1,-1) if the result is not true, else returns correct wall
 std::pair<int,int> PrimsMaze::exactly_one_room_not_in_path_adjacent_to_wall(const std::vector<std::pair<int,int>> &adj_rooms) {
     int count = 0;
@@ -106,6 +139,14 @@ std::pair<int,int> PrimsMaze::exactly_one_room_not_in_path_adjacent_to_wall(cons
     return room;
 
 }
+
+
+/*******************************************************************************
+ *     Method: generate_maze
+ *     Description: Generates a maze using Prim's algorithm by iteratively breaking walls and adding rooms to the path.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void PrimsMaze::generate_maze() {
     //1) mark all walls as closed && initialize grid coloring
     set_grid(0);
@@ -168,7 +209,6 @@ void PrimsMaze::generate_maze() {
         //d) remove the wall from the wall_list and the wall_set
         wall_set.erase({current_wall.first, current_wall.second});
         wall_list.erase(std::remove(wall_list.begin(), wall_list.end(), std::make_pair(current_wall.first, current_wall.second)), wall_list.end());
-        // wall_list.erase(std::remove(wall_list.begin(), wall_list.end(), std::make_pair(current_wall.first, current_wall.second)), wall_list.end());
     }
     std::pair<int, int> last_room = get_last_item(path_set);
     goal = last_room;
@@ -183,6 +223,14 @@ void PrimsMaze::generate_maze() {
     // }
 }
 
+/*******************************************************************************
+ *     Method: is_pair_in_set
+ *     Description: Checks if a given pair of coordinates exists in a specified set.
+ *     Parameters: const std::set<std::pair<int, int>>& my_set - The set to search in.
+ *                 int x - The x-coordinate of the pair.
+ *                 int y - The y-coordinate of the pair.
+ *     Return Value: bool - True if the pair exists in the set, false otherwise.
+ ********************************************************************************/
 bool PrimsMaze::is_pair_in_set(const std::set<std::pair<int, int>>& my_set, int x, int y) {
     return my_set.find({x, y}) != my_set.end();
 }

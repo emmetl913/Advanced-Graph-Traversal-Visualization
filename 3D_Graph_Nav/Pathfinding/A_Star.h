@@ -17,7 +17,7 @@
 #include <cfloat>
 #include <set>
 
-#define SIZE 99
+#define SIZE 33
 
 using namespace std;
 
@@ -31,23 +31,50 @@ struct cell
 
     double f, g, h;
 };
-
+/*******************************************************************************
+ *     Method: isValid
+ *     Description: Checks if a given cell is within the grid boundaries.
+ *     Parameters: int row - The row index of the cell.
+ *                 int col - The column index of the cell.
+ *     Return Value: bool - True if the cell is valid, false otherwise.
+ ********************************************************************************/
 bool isValid(int row, int col)
 {
     return (row >= 0) && (row < SIZE) &&
            (col >= 0) && (col < SIZE);
 }
-
+/*******************************************************************************
+ *     Method: isUnBlocked
+ *     Description: Checks if a given cell is not blocked in the grid.
+ *     Parameters: int grid[SIZE][SIZE] - The grid representing the maze.
+ *                 int row - The row index of the cell.
+ *                 int col - The column index of the cell.
+ *     Return Value: bool - True if the cell is unblocked, false otherwise.
+ ********************************************************************************/
 bool isUnBlocked(int grid[SIZE][SIZE], int row, int col)
 {
     return (grid[row][col] != 1);
 }
-
+/*******************************************************************************
+ *     Method: isDestination
+ *     Description: Checks if a given cell is the destination.
+ *     Parameters: int row - The row index of the cell.
+ *                 int col - The column index of the cell.
+ *                 Pair dest - The destination cell coordinates.
+ *     Return Value: bool - True if the cell is the destination, false otherwise.
+ ********************************************************************************/
 bool isDestination(int row, int col, Pair dest)
 {
     return (row == dest.first && col == dest.second);
 }
-
+/*******************************************************************************
+ *     Method: calculateHValue
+ *     Description: Calculates the heuristic value (Euclidean distance) for a cell.
+ *     Parameters: int row - The row index of the cell.
+ *                 int col - The column index of the cell.
+ *                 Pair dest - The destination cell coordinates.
+ *     Return Value: double - The heuristic value.
+ ********************************************************************************/
 double calculateHValue(int row, int col, Pair dest)
 {
     return (sqrt(
@@ -57,7 +84,13 @@ double calculateHValue(int row, int col, Pair dest)
     //return 0;
 }
 
-
+/*******************************************************************************
+ *     Method: tracePath
+ *     Description: Traces and prints the path from the source to the destination.
+ *     Parameters: cell cellDetails[][SIZE] - The details of each cell in the grid.
+ *                 Pair dest - The destination cell coordinates.
+ *     Return Value: void
+ ********************************************************************************/
 void tracePath(cell cellDetails[][SIZE], Pair dest)
 {
     printf("\nThe Path is ");
@@ -86,7 +119,13 @@ void tracePath(cell cellDetails[][SIZE], Pair dest)
 
     return;
 }
-
+/*******************************************************************************
+ *     Method: return_shortest_path_pair
+ *     Description: Traces and returns the shortest path as a stack of cell pairs.
+ *     Parameters: cell cellDetails[][SIZE] - The details of each cell in the grid.
+ *                 Pair dest - The destination cell coordinates.
+ *     Return Value: stack<Pair> - The stack containing the shortest path.
+ ********************************************************************************/
 stack<Pair> return_shortest_path_pair(cell cellDetails[][SIZE], Pair dest)
 {
     printf("\nThe Path is ");
@@ -116,8 +155,14 @@ stack<Pair> return_shortest_path_pair(cell cellDetails[][SIZE], Pair dest)
 
     return return_path;
 }
-
-
+/*******************************************************************************
+ *     Method: aStarSearch
+ *     Description: Implements the A* search algorithm to find the shortest path.
+ *     Parameters: int grid[][SIZE] - The grid representing the maze.
+ *                 Pair src - The source cell coordinates.
+ *                 Pair dest - The destination cell coordinates.
+ *     Return Value: stack<Pair> - The stack containing the shortest path.
+ ********************************************************************************/
 stack<Pair> aStarSearch(int grid[][SIZE], Pair src, Pair dest)
 {
     // If the source is out of range

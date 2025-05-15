@@ -289,7 +289,13 @@ void loop(GLFWwindow *window)
         glfwSwapBuffers( window );
     }
 }
-
+/*******************************************************************************
+ *     Method: display
+ *     Description: Renders the scene by setting up projection and camera matrices,
+ *                  clearing buffers, and calling the render_scene function.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void display( )
 {
     proj_matrix = mat4().identity();
@@ -325,9 +331,23 @@ void display( )
 
     glFlush();
 }
+/*******************************************************************************
+ *     Method: sleep
+ *     Description: Pauses the execution of the program for a specified number of milliseconds.
+ *     Parameters: int milliseconds - The duration to sleep in milliseconds.
+ *     Return Value: void
+ ********************************************************************************/
+
 void sleep(int milliseconds){
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
+/*******************************************************************************
+ *     Method: render_scene
+ *     Description: Draws the 3D scene, including walls, player, goal, and other objects,
+ *                  based on the `wall_loc` array and other global variables.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void render_scene() {
     model_matrix = mat4().identity();
     mat4 scale_matrix = mat4().identity();
@@ -398,7 +418,12 @@ void render_scene() {
         draw_mat_shadow_object(Sphere, Brass);
     }
 }
-
+/*******************************************************************************
+ *     Method: setup_walls
+ *     Description: Initializes the maze walls using either an algorithm or a file.
+ *     Parameters: bool flag - Determines whether to use an algorithm (true) or a file (false).
+ *     Return Value: void
+ ********************************************************************************/
 void setup_walls(bool flag)
 {
 
@@ -428,7 +453,12 @@ void setup_walls(bool flag)
     // wall_loc[player_x][player_y] = 2;
     //print_wall_array();
 }
-
+/*******************************************************************************
+ *     Method: find_num
+ *     Description: Finds the coordinates of the first occurrence of a specific number in the `wall_loc` array.
+ *     Parameters: int number - The number to search for in the array.
+ *     Return Value: std::pair<int, int> - The coordinates of the number or (-1, -1) if not found.
+ ********************************************************************************/
 pair<int,int> find_num(int number)
 {
     for (int i = 0; i < SIZE; ++i)
@@ -444,7 +474,12 @@ pair<int,int> find_num(int number)
     }
     return { -1, -1 };
 }
-
+/*******************************************************************************
+ *     Method: solve_the_maze
+ *     Description: Solves the maze using the A* algorithm and stores the movement history.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void solve_the_maze()
 {
     pair<int, int> src = find_num(2);
@@ -471,7 +506,12 @@ void solve_the_maze()
     }
     printf("Movement History: %zu", movement_history.size());
 }
-
+/*******************************************************************************
+ *     Method: print_wall_array
+ *     Description: Prints the `wall_loc` array to the console for debugging purposes.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void print_wall_array()
 {
     for (int i = 0; i < SIZE; ++i) {
@@ -484,7 +524,12 @@ void print_wall_array()
     if (debug_print)
         printf("Player position: %d, %d\n", player_x, player_y);
 }
-
+/*******************************************************************************
+ *     Method: print_wall_array
+ *     Description: Prints the `wall_loc` array to the console for debugging purposes.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void generate_walls_from_file()
 {
     // Open the maze file
@@ -538,7 +583,13 @@ void generate_walls_from_file()
     printf("Generated walls from file\n");
     print_wall_array();
 }
-
+/*******************************************************************************
+ *     Method: create_shadows
+ *     Description: Sets up shadow projection and camera matrices, renders the shadow scene,
+ *                  and binds the shadow framebuffer.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void create_shadows(){
     // TODO: Set shadow projection matrix
     shadow_proj_matrix = frustum(-1.0, 1.0, -1.0, 1.0, 1.0, 20.0);
@@ -563,7 +614,12 @@ void create_shadows(){
     // Reset viewport
     glViewport(0, 0, ww, hh);
 }
-
+/*******************************************************************************
+ *     Method: build_geometry
+ *     Description: Loads 3D models and creates vertex arrays and buffers for rendering.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void build_geometry( )
 {
     // Generate vertex arrays for objects
@@ -574,7 +630,12 @@ void build_geometry( )
     load_model(sphereFile, Sphere);
     load_model(torusFile, Torus);
 }
-
+/*******************************************************************************
+ *     Method: build_materials
+ *     Description: Creates material properties for objects and uploads them to a uniform buffer.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void build_materials( ) {
     // Create brass material
     MaterialProperties brass = {
@@ -630,7 +691,12 @@ void build_materials( ) {
     glBindBuffer(GL_UNIFORM_BUFFER, MaterialBuffers[MaterialBuffer]);
     glBufferData(GL_UNIFORM_BUFFER, Materials.size()*sizeof(MaterialProperties), Materials.data(), GL_STATIC_DRAW);
 }
-
+/*******************************************************************************
+ *     Method: build_lights
+ *     Description: Initializes light properties, uploads them to a uniform buffer, and enables lights.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void build_lights( ) {
     // Spot white light
     // LightProperties whiteSpotLight = {
@@ -676,7 +742,12 @@ void build_lights( ) {
     glBindBuffer(GL_UNIFORM_BUFFER, LightBuffers[LightBuffer]);
     glBufferData(GL_UNIFORM_BUFFER, Lights.size()*sizeof(LightProperties), Lights.data(), GL_STATIC_DRAW);
 }
-
+/*******************************************************************************
+ *     Method: build_shadows
+ *     Description: Creates a framebuffer and texture for storing shadow distances.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void build_shadows( ) {
     // Generate new framebuffer and corresponding texture for storing shadow distances
     glGenFramebuffers(1, &ShadowBuffer);
@@ -695,7 +766,13 @@ void build_shadows( ) {
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
+/*******************************************************************************
+ *     Method: load_model
+ *     Description: Loads a 3D model from a file and creates buffers for its vertices, normals, and texture coordinates.
+ *     Parameters: const char *filename - The path to the model file.
+ *                 GLuint obj - The object ID to associate with the model.
+ *     Return Value: void
+ ********************************************************************************/
 void load_model(const char * filename, GLuint obj) {
     vector<vec4> vertices;
     vector<vec2> uvCoords;
@@ -716,7 +793,13 @@ void load_model(const char * filename, GLuint obj) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*texCoords*numVertices[obj], uvCoords.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-
+/*******************************************************************************
+ *     Method: draw_mat_shadow_object
+ *     Description: Draws a 3D object with material and shadow properties.
+ *     Parameters: GLuint obj - The object ID to draw.
+ *                 GLuint material - The material ID to apply to the object.
+ *     Return Value: void
+ ********************************************************************************/
 void draw_mat_shadow_object(GLuint obj, GLuint material){
     // Reference appropriate shader variables
     if (shadow) {
@@ -794,14 +877,26 @@ void draw_mat_shadow_object(GLuint obj, GLuint material){
     // Draw object
     glDrawArrays(GL_TRIANGLES, 0, numVertices[obj]);
 }
-//Use this function to check for walls
+/*******************************************************************************
+ *     Method: can_move
+ *     Description: Checks if the player can move to a specified position in the maze.
+ *     Parameters: int x - The x-coordinate of the position.
+ *                 int y - The y-coordinate of the position.
+ *     Return Value: bool - True if the position is movable, false otherwise.
+ ********************************************************************************/
 bool can_move(int x, int y){
     //Only allow the player to move into a space with the value 0
     if (wall_loc[y][x] == 0 || wall_loc[y][x] == 3)
         return true;
     return false;
 }
-
+/*******************************************************************************
+ *     Method: move_player
+ *     Description: Moves the player to a new position if it is valid and updates the `wall_loc` array.
+ *     Parameters: int x - The new x-coordinate of the player.
+ *                 int y - The new y-coordinate of the player.
+ *     Return Value: void
+ ********************************************************************************/
 void move_player(int x, int y){
     if (can_move(x,y)){
         wall_loc[y][x] = 2; //Set new position to have player in it.
@@ -821,7 +916,12 @@ void move_player(int x, int y){
     }
 
 }
-
+/*******************************************************************************
+ *     Method: generate_spiral_movement
+ *     Description: Generates a spiral movement pattern and stores it in the movement history.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void generate_spiral_movement() {
     int top = 0;
     int bottom = SIZE - 2;
@@ -858,7 +958,12 @@ void generate_spiral_movement() {
         }
     }
 }
-
+/*******************************************************************************
+ *     Method: replay_movement_thread
+ *     Description: Replays the movement history in a separate thread.
+ *     Parameters: std::deque<std::pair<int, int>> q - The movement history to replay.
+ *     Return Value: void
+ ********************************************************************************/
 void replay_movement_thread(std::deque<std::pair<int, int>> q) {
     {
         std::lock_guard<std::mutex> lock(replay_mutex);
@@ -881,7 +986,12 @@ void replay_movement_thread(std::deque<std::pair<int, int>> q) {
     }
 }
 
-//i = 0: Replay movement, i = 1: Replay Maze Generation
+/*******************************************************************************
+ *     Method: start_replay
+ *     Description: Starts the replay of movement or maze generation in a separate thread.
+ *     Parameters: int i - The type of replay (0 for movement, 1 for maze generation).
+ *     Return Value: void
+ ********************************************************************************/
 void start_replay(int i) {
     std::lock_guard<std::mutex> lock(replay_mutex);
     if (!is_replay_active) {
@@ -895,7 +1005,16 @@ void start_replay(int i) {
         // }
     }
 }
-
+/*******************************************************************************
+ *     Method: key_callback
+ *     Description: Handles keyboard input for controlling the camera, player movement, and other actions.
+ *     Parameters: GLFWwindow *window - The window receiving the input.
+ *                 int key - The key pressed or released.
+ *                 int scancode - The system-specific scancode of the key.
+ *                 int action - The action (press, release, or repeat).
+ *                 int mods - Modifier keys (e.g., Shift, Ctrl).
+ *     Return Value: void
+ ********************************************************************************/
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     // ESC closes window
     if (key == GLFW_KEY_ESCAPE) {
@@ -981,11 +1100,26 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         start_replay(0);
     }
 }
-
+/*******************************************************************************
+ *     Method: mouse_callback
+ *     Description: Handles mouse input for the application (currently empty).
+ *     Parameters: GLFWwindow *window - The window receiving the input.
+ *                 int button - The mouse button pressed or released.
+ *                 int action - The action (press or release).
+ *                 int mods - Modifier keys (e.g., Shift, Ctrl).
+ *     Return Value: void
+ ********************************************************************************/
 void mouse_callback(GLFWwindow *window, int button, int action, int mods){
 
 }
-
+/*******************************************************************************
+ *     Method: framebuffer_size_callback
+ *     Description: Adjusts the viewport size when the window is resized.
+ *     Parameters: GLFWwindow *window - The window being resized.
+ *                 int width - The new width of the window.
+ *                 int height - The new height of the window.
+ *     Return Value: void
+ ********************************************************************************/
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 
@@ -996,7 +1130,12 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // Debug shadow renderer
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
-
+/*******************************************************************************
+ *     Method: renderQuad
+ *     Description: Renders a quad for debugging purposes, displaying the shadow map.
+ *     Parameters: None
+ *     Return Value: void
+ ********************************************************************************/
 void renderQuad()
 {
     // reset viewport
